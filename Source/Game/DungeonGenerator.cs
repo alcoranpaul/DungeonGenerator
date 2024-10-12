@@ -24,6 +24,8 @@ public class DungeonGenerator : Script
 	public int DungeonWidth = 100 * 5;
 	public int DungeonHeight = 100;
 
+	public float RoomSizeOffset = 0.7f;
+
 	// private List<Model> modelRooms;
 	private List<Room> rooms;
 	// private DungeonGeneratorData dungeonData;
@@ -56,15 +58,18 @@ public class DungeonGenerator : Script
 		for (int i = 0; i < MaxRooms; i++)
 		{
 			Model _model = Content.CreateVirtualAsset<Model>();
-			rooms.Add(GenerateRoom(_model));
+			GenerateRoom(_model, out Room newRoom);
+			rooms.Add(newRoom);
 
 			// modelRooms.Add(_model);
 		}
 
 	}
 
-	private Room GenerateRoom(Model _model)
+	private void GenerateRoom(Model _model, out Room _room)
 	{
+		_room = null;
+
 		// Create the dynamic model with a single LOD and one mesh
 		_model.SetupLODs(new[] { 1 });
 
@@ -84,6 +89,10 @@ public class DungeonGenerator : Script
 		// Update mesh with initial width (X), fixed-height (Y), and length (Z)
 		UpdateMesh(_model.LODs[0].Meshes[0], Width, Height, Length);
 
+		bool isPositionValid = FindValidRoomPosition(_model, Actor.Position, out Vector3 position);
+
+		if (!isPositionValid) return;
+
 		// Create or reuse a child model actor
 		var childModel = Actor.AddChild<StaticModel>();
 		childModel.Name = "Room" + childModel.ID;
@@ -93,16 +102,29 @@ public class DungeonGenerator : Script
 
 		var collider = childModel.AddChild<BoxCollider>();
 		collider.AutoResize(true);
+		childModel.LocalPosition = position;
 
-		SetPosition(childModel);
-		Debug.Log($"Position: {childModel.LocalPosition}");
 
-		Vector2 roomPosition = new Vector2(childModel.LocalPosition.X, childModel.LocalPosition.Z);
-		return new Room(roomPosition, Width, Length, Height, childModel);
+		RoomPosition roomPosition = new RoomPosition(childModel.LocalPosition.X, childModel.LocalPosition.Z);
+		_room = new Room(roomPosition, Width, Length, Height, childModel);
+		return;
 	}
 
-	private void SetPosition(StaticModel staticModel)
+	private bool FindValidRoomPosition(Model model, Vector3 origin, out Vector3 _position)
 	{
+
+		BoundingBox modelBounds = model.GetBox(0);
+		return FindValidRoomPosition(origin, modelBounds, 5, out _position);
+	}
+
+	private bool FindValidRoomPosition(Vector3 origin, BoundingBox modelBounds, int maxAttemps, out Vector3 _position)
+	{
+		if (maxAttemps <= 0)
+		{
+			_position = Vector3.Zero;
+			return false;
+		}
+
 		// Create a random generator
 		Random rnd = new Random();
 
@@ -113,15 +135,9 @@ public class DungeonGenerator : Script
 			rnd.Next((int)dungeonBounds.Minimum.Z, (int)dungeonBounds.Maximum.Z)
 		);
 
-
-		// Retrieve the bounding box of the StaticModel
-		BoundingBox modelBounds = staticModel.Model.GetBox(staticModel.Transform);
-		// DebugDraw.DrawBox(modelBounds, Color.Green, 10.0f);
-
 		// Calculate half-extents of the model
-		Vector3 halfExtents = (modelBounds.Maximum - modelBounds.Minimum) * 0.5f;
-		// Debug.Log("Half extents: " + halfExtents);
-		DebugDraw.DrawBox(new BoundingBox(staticModel.Transform.TransformPoint(position) - modelBounds.Minimum, staticModel.Transform.TransformPoint(position) + modelBounds.Minimum), Color.Green, 1.0f);
+		Vector3 halfExtents = (modelBounds.Maximum - modelBounds.Minimum) * RoomSizeOffset;
+
 
 		// Perform the BoxCast (or any other logic with halfExtents)
 		bool hit = Physics.BoxCast(
@@ -136,12 +152,12 @@ public class DungeonGenerator : Script
 		// If there is no hit, set the position
 		if (!hit)
 		{
-			staticModel.LocalPosition = position;
+			_position = position;
+			return true;
 		}
-		else
-		{
-			Debug.Log($"{staticModel} hit something at {position}");
-		}
+
+		return FindValidRoomPosition(origin, modelBounds, maxAttemps--, out _position);
+
 	}
 
 

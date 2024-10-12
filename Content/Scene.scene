@@ -1,7 +1,7 @@
 {
 	"ID": "5400f3474426a3b83ca4fb919ceaf713",
 	"TypeName": "FlaxEngine.SceneAsset",
-	"EngineBuild": 6604,
+	"EngineBuild": 6605,
 	"Data": [
 		{
 			"ID": "5400f3474426a3b83ca4fb919ceaf713",
@@ -172,7 +172,7 @@
 	"ScaleFactor": 1.0,
 	"PhysicalUnit": 3,
 	"PhysicalUnitSize": 1.0,
-	"ResolutionMode": 0,
+	"ResolutionMode": 1,
 	"ResolutionMin": {
 		"X": 1920.0,
 		"Y": 1080.0
@@ -229,7 +229,7 @@
 			"Name": "Button",
 			"Transform": {
 				"Translation": {
-					"X": 1772.0,
+					"X": 932.0,
 					"Y": 17.0,
 					"Z": 0.0
 				},
