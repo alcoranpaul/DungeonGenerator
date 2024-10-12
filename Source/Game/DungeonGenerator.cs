@@ -24,7 +24,8 @@ public class DungeonGenerator : Script
 	public int DungeonWidth = 100 * 5;
 	public int DungeonHeight = 100;
 
-	private List<Model> modelRooms;
+	// private List<Model> modelRooms;
+	private List<Room> rooms;
 	// private DungeonGeneratorData dungeonData;
 	private BoundingBox dungeonBounds;
 
@@ -39,15 +40,11 @@ public class DungeonGenerator : Script
 	}
 	public override void OnStart()
 	{
-		modelRooms = new List<Model>();
+		// modelRooms = new List<Model>();
+		rooms = new List<Room>();
 
-		// JsonAsset settings = Engine.GetCustomSettings("DungeonGeneratorData");
-		// if (settings) dungeonData = settings.CreateInstance<DungeonGeneratorData>();
-		// Debug.Log("DungeonGeneratorData loaded: " + dungeonData);
 		dungeonBounds = new BoundingBox(new Vector3(-DungeonWidth, -10, -DungeonWidth), new Vector3(DungeonWidth, 10, DungeonWidth));
 
-		// DebugDraw.DrawBox(dungeonBounds, Color.Red, 10.0f);
-		// GenerateDungeon();
 	}
 
 	public void GenerateDungeon()
@@ -55,23 +52,37 @@ public class DungeonGenerator : Script
 		Debug.Log("Generating dungeon...");
 
 		DestroyDungeon();
+
 		for (int i = 0; i < MaxRooms; i++)
 		{
 			Model _model = Content.CreateVirtualAsset<Model>();
-			GenerateModel(_model);
-			modelRooms.Add(_model);
+			rooms.Add(GenerateRoom(_model));
+
+			// modelRooms.Add(_model);
 		}
 
 	}
 
-	private void GenerateModel(Model _model)
+	private Room GenerateRoom(Model _model)
 	{
 		// Create the dynamic model with a single LOD and one mesh
-
 		_model.SetupLODs(new[] { 1 });
 
-		// Update mesh with initial width, height, and fixed Z-length
-		UpdateMesh(_model.LODs[0].Meshes[0]);
+		// Use System.Random, which is already time-seeded
+		var rnd = new Random();
+
+		// Get random values for Width, Height, and Length
+		int Width = rnd.Next(MinRoomWidth, MaxRoomWidth);
+		int Height = MinRoomHeight;
+		int Length = rnd.Next(MinRoomLength, MaxRoomLength);
+
+		// Apply scaling factor
+		Width *= UnitScale;
+		Height *= UnitScale;
+		Length *= UnitScale;
+
+		// Update mesh with initial width (X), fixed-height (Y), and length (Z)
+		UpdateMesh(_model.LODs[0].Meshes[0], Width, Height, Length);
 
 		// Create or reuse a child model actor
 		var childModel = Actor.AddChild<StaticModel>();
@@ -79,9 +90,15 @@ public class DungeonGenerator : Script
 		childModel.Model = _model;
 		childModel.LocalScale = new Float3(1); // No scaling applied
 		childModel.SetMaterial(0, Material);
+
 		var collider = childModel.AddChild<BoxCollider>();
 		collider.AutoResize(true);
+
 		SetPosition(childModel);
+		Debug.Log($"Position: {childModel.LocalPosition}");
+
+		Vector2 roomPosition = new Vector2(childModel.LocalPosition.X, childModel.LocalPosition.Z);
+		return new Room(roomPosition, Width, Length, Height, childModel);
 	}
 
 	private void SetPosition(StaticModel staticModel)
@@ -103,7 +120,7 @@ public class DungeonGenerator : Script
 
 		// Calculate half-extents of the model
 		Vector3 halfExtents = (modelBounds.Maximum - modelBounds.Minimum) * 0.5f;
-		Debug.Log("Half extents: " + halfExtents);
+		// Debug.Log("Half extents: " + halfExtents);
 		DebugDraw.DrawBox(new BoundingBox(staticModel.Transform.TransformPoint(position) - modelBounds.Minimum, staticModel.Transform.TransformPoint(position) + modelBounds.Minimum), Color.Green, 1.0f);
 
 		// Perform the BoxCast (or any other logic with halfExtents)
@@ -131,32 +148,31 @@ public class DungeonGenerator : Script
 
 	public void DestroyDungeon()
 	{
-		if (modelRooms.Count > 0)
+		// If there are rooms in the list
+		if (rooms.Count > 0)
 		{
-			foreach (Model _model in modelRooms)
+			// Iterate through each room and set it to null
+			for (int i = 0; i < rooms.Count; i++)
 			{
-				FlaxEngine.Object.Destroy(_model);
+				rooms[i] = null;  // Set the room reference to null
 			}
+
+			// Now clear the list itself
+			rooms.Clear();  // Remove all items from the list
 		}
-		if (Actor.ChildrenCount > 0) Actor.DestroyChildren();
+
+		// If Actor has children, destroy them
+		if (Actor.ChildrenCount > 0)
+		{
+			Actor.DestroyChildren();
+		}
 	}
 
+
 	// Method to generate the cube mesh
-	private void UpdateMesh(Mesh mesh)
+	private void UpdateMesh(Mesh mesh, int Width, int Height, int Length)
 	{
-		// Use System.Random, which is already time-seeded
-		var rnd = new Random();
 
-		// Get random values for Width, Height, and Length
-		int Width = rnd.Next(MinRoomWidth, MaxRoomWidth);
-		int Height = MinRoomHeight;
-		int Length = rnd.Next(MinRoomLength, MaxRoomLength);
-
-		// Debug.Log("Width: " + Width + ", Height: " + Height + ", Length: " + Length);
-		// Apply scaling factor
-		Width *= UnitScale;
-		Height *= UnitScale;
-		Length *= UnitScale;
 
 
 		// Define vertices for a cube (cuboid) with the given width, height, and fixed Z length
