@@ -46,6 +46,7 @@ public class DungeonGenerator : Script
 		rooms = new List<Room>();
 
 		dungeonBounds = new BoundingBox(new Vector3(-DungeonWidth, -10, -DungeonWidth), new Vector3(DungeonWidth, 10, DungeonWidth));
+		DebugDraw.DrawWireBox(dungeonBounds, Color.Beige, 10.0f);
 
 	}
 
@@ -55,15 +56,29 @@ public class DungeonGenerator : Script
 
 		DestroyDungeon();
 
+		SpawnRooms();
+
+		List<Delaunay.Point> points = new List<Delaunay.Point>();
+		foreach (var room in rooms)
+		{
+			Delaunay.Point point = new Delaunay.Point(room.WorldPosition.X, room.WorldPosition.Z);
+			points.Add(point);
+		}
+		Delaunay delaunay = Delaunay.Triangulate(points);
+
+		// Debug.Log($"Triangles: {delaunay.Triangles.Count}");
+
+
+	}
+
+	private void SpawnRooms()
+	{
 		for (int i = 0; i < MaxRooms; i++)
 		{
 			Model _model = Content.CreateVirtualAsset<Model>();
 			GenerateRoom(_model, out Room newRoom);
 			rooms.Add(newRoom);
-
-			// modelRooms.Add(_model);
 		}
-
 	}
 
 	private void GenerateRoom(Model _model, out Room _room)
@@ -93,7 +108,8 @@ public class DungeonGenerator : Script
 
 		if (!isPositionValid) return;
 
-		// Create or reuse a child model actor
+		// Create a child model actor
+		// WhatIf: Seperate Actor and Data 
 		var childModel = Actor.AddChild<StaticModel>();
 		childModel.Name = "Room" + childModel.ID;
 		childModel.Model = _model;
