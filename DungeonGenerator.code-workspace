@@ -1,0 +1,21 @@
+{
+	"settings": {
+		"typescript.tsc.autoDetect": "off",
+		"npm.autoDetect": "off",
+		"gulp.autoDetect": "off",
+		"jake.autoDetect": "off",
+		"grunt.autoDetect": "off",
+		"omnisharp.defaultLaunchSolution": "DungeonGenerator.sln",
+		"omnisharp.useModernNet": true
+	},
+	"folders": [
+		{
+			"name": "DungeonGenerator",
+			"path": "."
+		},
+		{
+			"name": "Flax",
+			"path": "E:\\Game Development\\Flax\\Flax_master"
+		}
+	]
+}

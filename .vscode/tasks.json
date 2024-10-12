@@ -1,0 +1,137 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "DungeonGenerator|Editor.Windows.Debug|x64",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"command": "..\\..\\..\\..\\Game Development\\Flax\\Flax_master\\Binaries\\Tools\\Flax.Build",
+			"args": [
+				"-build",
+				"-log",
+				"-mutex",
+				"\\\"-workspace=E:\\Projects\\Game Dev\\Flax\\DungeonGenerator\\\"",
+				"-arch=x64",
+				"-configuration=Debug",
+				"-platform=Windows",
+				"-buildTargets=GameEditorTarget"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator"
+			}
+		},
+		{
+			"label": "DungeonGenerator|Editor.Windows.Development|x64",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"command": "..\\..\\..\\..\\Game Development\\Flax\\Flax_master\\Binaries\\Tools\\Flax.Build",
+			"args": [
+				"-build",
+				"-log",
+				"-mutex",
+				"\\\"-workspace=E:\\Projects\\Game Dev\\Flax\\DungeonGenerator\\\"",
+				"-arch=x64",
+				"-configuration=Development",
+				"-platform=Windows",
+				"-buildTargets=GameEditorTarget"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator"
+			}
+		},
+		{
+			"label": "DungeonGenerator|Editor.Windows.Release|x64",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"command": "..\\..\\..\\..\\Game Development\\Flax\\Flax_master\\Binaries\\Tools\\Flax.Build",
+			"args": [
+				"-build",
+				"-log",
+				"-mutex",
+				"\\\"-workspace=E:\\Projects\\Game Dev\\Flax\\DungeonGenerator\\\"",
+				"-arch=x64",
+				"-configuration=Release",
+				"-platform=Windows",
+				"-buildTargets=GameEditorTarget"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator"
+			}
+		},
+		{
+			"label": "DungeonGenerator|Game.Windows.Debug|x64",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"command": "..\\..\\..\\..\\Game Development\\Flax\\Flax_master\\Binaries\\Tools\\Flax.Build",
+			"args": [
+				"-build",
+				"-log",
+				"-mutex",
+				"\\\"-workspace=E:\\Projects\\Game Dev\\Flax\\DungeonGenerator\\\"",
+				"-arch=x64",
+				"-configuration=Debug",
+				"-platform=Windows",
+				"-buildTargets=GameTarget"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator"
+			}
+		},
+		{
+			"label": "DungeonGenerator|Game.Windows.Development|x64",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"command": "..\\..\\..\\..\\Game Development\\Flax\\Flax_master\\Binaries\\Tools\\Flax.Build",
+			"args": [
+				"-build",
+				"-log",
+				"-mutex",
+				"\\\"-workspace=E:\\Projects\\Game Dev\\Flax\\DungeonGenerator\\\"",
+				"-arch=x64",
+				"-configuration=Development",
+				"-platform=Windows",
+				"-buildTargets=GameTarget"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator"
+			}
+		},
+		{
+			"label": "DungeonGenerator|Game.Windows.Release|x64",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"command": "..\\..\\..\\..\\Game Development\\Flax\\Flax_master\\Binaries\\Tools\\Flax.Build",
+			"args": [
+				"-build",
+				"-log",
+				"-mutex",
+				"\\\"-workspace=E:\\Projects\\Game Dev\\Flax\\DungeonGenerator\\\"",
+				"-arch=x64",
+				"-configuration=Release",
+				"-platform=Windows",
+				"-buildTargets=GameTarget"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator"
+			}
+		}
+	]
+}

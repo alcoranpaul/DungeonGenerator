@@ -1,0 +1,101 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "coreclr",
+			"name": "DungeonGenerator|Editor.Windows.Debug|x64 (C#)",
+			"request": "launch",
+			"preLaunchTask": "DungeonGenerator|Editor.Windows.Debug|x64",
+			"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+			"program": "E:\\Game Development\\Flax\\Flax_master\\Binaries\\Editor\\Win64\\Debug\\FlaxEditor",
+			"args": [
+				"-project",
+				"E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+				"-skipCompile"
+			],
+			"stopAtEntry": false,
+			"externalConsole": true
+		},
+		{
+			"type": "coreclr",
+			"name": "DungeonGenerator|Editor.Windows.Development|x64 (C#)",
+			"request": "launch",
+			"preLaunchTask": "DungeonGenerator|Editor.Windows.Development|x64",
+			"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+			"program": "E:\\Game Development\\Flax\\Flax_master\\Binaries\\Editor\\Win64\\Development\\FlaxEditor",
+			"args": [
+				"-project",
+				"E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+				"-skipCompile"
+			],
+			"stopAtEntry": false,
+			"externalConsole": true
+		},
+		{
+			"type": "coreclr",
+			"name": "DungeonGenerator|Editor.Windows.Release|x64 (C#)",
+			"request": "launch",
+			"preLaunchTask": "DungeonGenerator|Editor.Windows.Release|x64",
+			"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+			"program": "E:\\Game Development\\Flax\\Flax_master\\Binaries\\Editor\\Win64\\Release\\FlaxEditor",
+			"args": [
+				"-project",
+				"E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+				"-skipCompile"
+			],
+			"stopAtEntry": false,
+			"externalConsole": true
+		},
+		{
+			"type": "coreclr",
+			"name": "DungeonGenerator|Game.Windows.Debug|x64 (C#)",
+			"request": "launch",
+			"preLaunchTask": "DungeonGenerator|Game.Windows.Debug|x64",
+			"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+			"program": "E:\\Game Development\\Flax\\Flax_master\\Binaries\\Editor\\Win64\\Debug\\FlaxEditor",
+			"args": [
+				"-project",
+				"E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+				"-skipCompile"
+			],
+			"stopAtEntry": false,
+			"externalConsole": true
+		},
+		{
+			"type": "coreclr",
+			"name": "DungeonGenerator|Game.Windows.Development|x64 (C#)",
+			"request": "launch",
+			"preLaunchTask": "DungeonGenerator|Game.Windows.Development|x64",
+			"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+			"program": "E:\\Game Development\\Flax\\Flax_master\\Binaries\\Editor\\Win64\\Development\\FlaxEditor",
+			"args": [
+				"-project",
+				"E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+				"-skipCompile"
+			],
+			"stopAtEntry": false,
+			"externalConsole": true
+		},
+		{
+			"type": "coreclr",
+			"name": "DungeonGenerator|Game.Windows.Release|x64 (C#)",
+			"request": "launch",
+			"preLaunchTask": "DungeonGenerator|Game.Windows.Release|x64",
+			"cwd": "E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+			"program": "E:\\Game Development\\Flax\\Flax_master\\Binaries\\Editor\\Win64\\Release\\FlaxEditor",
+			"args": [
+				"-project",
+				"E:\\Projects\\Game Dev\\Flax\\DungeonGenerator",
+				"-skipCompile"
+			],
+			"stopAtEntry": false,
+			"externalConsole": true
+		},
+		{
+			"type": "coreclr",
+			"name": "DungeonGenerator (C# Attach Editor)",
+			"request": "attach",
+			"processName": "FlaxEditor"
+		}
+	]
+}

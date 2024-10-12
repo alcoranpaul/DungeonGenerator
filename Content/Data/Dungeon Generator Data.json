@@ -1,0 +1,17 @@
+{
+	"ID": "47940f334ab0d0c03d455188cc044de9",
+	"TypeName": "Game.DungeonGeneratorData",
+	"EngineBuild": 6604,
+	"Data": {
+	"MaxRooms": 20,
+	"UnitScale": 5,
+	"MaxRoomHeight": 10,
+	"MinRoomHeight": 5,
+	"MaxRoomWidth": 10,
+	"MinRoomWidth": 5,
+	"MaxRoomLength": 10,
+	"MinRoomLength": 5,
+	"DungeonWidth": 100,
+	"DungeonHeight": 100
+}
+}
