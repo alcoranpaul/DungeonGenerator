@@ -19,6 +19,8 @@ public class DungeonUI : Script
 	public UIControl debugControl;
 	private Button debugButton;
 
+	public InputEvent TestEvent = new InputEvent("Test");
+
 	public override void OnAwake()
 	{
 		if (dungeonControl == null || !dungeonControl.Is<Button>())
@@ -47,6 +49,29 @@ public class DungeonUI : Script
 
 		debugButton = debugControl.Get<Button>();
 		debugButton.Clicked += ClearDebugDraw;
+
+		TestEvent.Pressed += CalculatePath;
+	}
+
+	private void CalculatePath()
+	{
+		var pos = Input.MousePosition;
+		var ray = Camera.MainCamera.ConvertMouseToRay(pos);
+		if (Physics.RayCast(ray.Position, ray.Direction, out RayCastHit hit))
+		{
+			Debug.Log($"Mouse hit: {hit.Point}");
+			// GridSystem<Pathfinding.PathNode>.Position gridPos = new GridSystem<Pathfinding.PathNode>.Position(hit.Point);
+			// DungeonGenerator.Instance.GridSystem.GetWorldPosition()
+		}
+
+	}
+
+
+
+	public override void OnDestroy()
+	{
+		TestEvent.Dispose();
+		base.OnDestroy();
 	}
 
 	private void ClearDebugDraw()

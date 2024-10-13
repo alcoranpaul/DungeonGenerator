@@ -10,9 +10,9 @@ namespace Game;
 public class GridObject
 {
 	public GridSystem<GridObject> GridSystem { get; private set; }
-	public GridSystem<GridObject>.Position GridPosition { get; private set; }
+	public GridPosition GridPosition { get; private set; }
 
-	public GridObject(GridSystem<GridObject> gridSystem, GridSystem<GridObject>.Position gridPosition)
+	public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
 	{
 		GridSystem = gridSystem;
 		GridPosition = gridPosition;

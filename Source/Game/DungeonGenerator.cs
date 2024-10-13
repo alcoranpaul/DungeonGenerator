@@ -37,8 +37,10 @@ public class DungeonGenerator : Script
 	// Reference to the material
 	public MaterialBase Material;
 	public Prefab debugGridPrefab;
+	public Prefab pathfindingDebugPrefab;
 
 	public GridSystem<GridObject> GridSystem { get; private set; }
+	public Pathfinding Pathfinding { get; private set; }
 
 	public override void OnAwake()
 	{
@@ -48,9 +50,14 @@ public class DungeonGenerator : Script
 
 	public void GenerateGridSystem()
 	{
-		GridSystem = new GridSystem<GridObject>(new Vector2(10, 10), 1, (GridSystem<GridObject> gridSystem, GridSystem<GridObject>.Position gridPosition) => { return new GridObject(gridSystem, gridPosition); });
+		// Grid system for room generation
+		GridSystem = new GridSystem<GridObject>(new Vector2(10, 10), 1, (GridSystem<GridObject> gridSystem, GridPosition gridPosition) => { return new GridObject(gridSystem, gridPosition); });
+		// GridSystem.CreateDebugObjects(debugGridPrefab);
 
-		GridSystem.CreateDebugObjects(debugGridPrefab);
+		// Grid system for hallways
+		Pathfinding = new Pathfinding(new Vector2(10, 10), 1, pathfindingDebugPrefab);
+
+
 	}
 	public override void OnStart()
 	{

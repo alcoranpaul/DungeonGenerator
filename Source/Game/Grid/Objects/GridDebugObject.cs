@@ -10,15 +10,16 @@ namespace Game;
 public class GridDebugObject : Script
 {
 	public TextRender TextRender;
-	private GridObject _gridObject;
+	protected object _gridObject;
 
-	public void SetGridObject(GridObject gridObject)
+	public virtual void SetGridObject(object gridObject)
 	{
 		_gridObject = gridObject;
-		SetText(_gridObject.GridPosition.ToString());
 	}
-	public void SetText(string text)
+	protected virtual void SetText(string text)
 	{
 		TextRender.Text = text;
 	}
+
+
 }

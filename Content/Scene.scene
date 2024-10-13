@@ -104,7 +104,8 @@
 	"MaxRooms": 10,
 	"MinRoomLength": 2,
 	"DungeonWidth": 100,
-	"debugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a"
+	"debugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a",
+	"pathfindingDebugPrefab": "b71b10e044f0a7eb83c1a99fda4c90a1"
 }
 		},
 		{

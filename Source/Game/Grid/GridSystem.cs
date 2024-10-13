@@ -9,53 +9,48 @@ namespace Game;
 /// </summary>
 public class GridSystem<TGridObject>
 {
-	public class Position
-	{
-		public int X;
-		public int Z;
-
-		public Position(int x, int z)
-		{
-			X = x;
-			Z = z;
-		}
-
-		public override string ToString()
-		{
-			return $"({X}, {Z})";
-		}
-
-	}
 
 	public Vector2 Dimension { get; private set; }
 	public float UnitScale { get; private set; }
 	public Vector3 Origin { get; private set; }  // Store the origin
-												 // Conversion factor from centimeters to meters
-	private const float METERS_TO_CM = 100f;
+
+	private const float METERS_TO_CM = 100f; // Conversion factor from centimeters to meters
 	private readonly TGridObject[,] gridObjects;
 
-	public GridSystem(Vector2 dimension, float unitScale, Func<GridSystem<TGridObject>, Position, TGridObject> createGridObject)
+
+	public GridSystem(Vector2 dimension, float unitScale, Func<GridSystem<TGridObject>, GridPosition, TGridObject> createGridObject)
 	{
 		Dimension = dimension;
 		// Convert UnitScale from centimeters to meters
 		UnitScale = unitScale * METERS_TO_CM;
 		// Convert Origin from centimeters to meters
 		Origin = Vector3.Zero * METERS_TO_CM;
+
 		gridObjects = new TGridObject[(int)Dimension.X, (int)Dimension.Y];
 
-		DrawGridBoundingBox();
 		for (int x = 0; x < Dimension.X; x++)
 		{
 			for (int z = 0; z < Dimension.Y; z++)
 			{
-				Position pos = new Position(x, z);
+				GridPosition pos = new GridPosition(x, z);
 				gridObjects[x, z] = createGridObject(this, pos);
-
-				BoundingSphere sphere = new BoundingSphere(GetWorldPosition(pos), 5f); // Convert radius to meters
-				DebugDraw.DrawSphere(sphere, Color.Red, 20);
-				// DebugDraw.DrawLine(GetWorldPosition(pos), GetWorldPosition(pos) + Vector3.Right * .2f, Color.White, 1000);
 			}
 		}
+	}
+
+	public bool IsPositionValid(int x, int z)
+	{
+		return IsPositionXValid(x) && IsPositionZValid(z);
+	}
+
+	public bool IsPositionXValid(int x)
+	{
+		return x >= 0 && x < Dimension.X;
+	}
+
+	public bool IsPositionZValid(int z)
+	{
+		return z >= 0 && z < Dimension.Y;
 	}
 
 	public void CreateDebugObjects(Prefab prefab)
@@ -64,22 +59,28 @@ public class GridSystem<TGridObject>
 		{
 			for (int z = 0; z < Dimension.Y; z++)
 			{
-				Position gridPos = new Position(x, z);
+				GridPosition gridPos = new GridPosition(x, z);
 				Actor debugObj = PrefabManager.SpawnPrefab(prefab, GetWorldPosition(gridPos), Quaternion.Identity);
 
 				if (!debugObj.TryGetScript<GridDebugObject>(out var gridDebugObject)) return;
 
-				gridDebugObject.SetGridObject(GetGridObject(gridPos) as GridObject);
+
+				gridDebugObject.SetGridObject(GetGridObject(gridPos));
+
+				BoundingSphere sphere = new BoundingSphere(GetWorldPosition(gridPos), 5f); // Convert radius to meters
+				DebugDraw.DrawSphere(sphere, Color.Red, 20);
+
 			}
 		}
+		DrawGridBoundingBox();
 	}
 
 
 	public BoundingBox GetBoundingBox(out Vector3 minWorldPos, out Vector3 maxWorldPos)
 	{
 		// Define grid boundaries in grid coordinates
-		Position min = new Position(0, 0);
-		Position max = new Position((int)Dimension.X - 1, (int)Dimension.Y - 1);
+		GridPosition min = new GridPosition(0, 0);
+		GridPosition max = new GridPosition((int)Dimension.X - 1, (int)Dimension.Y - 1);
 
 		// Get the world positions with the center offset
 		minWorldPos = GetWorldPosition(min);
@@ -100,7 +101,7 @@ public class GridSystem<TGridObject>
 	}
 
 	// Assuming GetWorldPosition is defined elsewhere
-	private Vector3 GetWorldPosition(Position pos)
+	public Vector3 GetWorldPosition(GridPosition pos)
 	{
 		// Offset the dimensions by 1 to account for zero-based indexing
 		float gridSizeX = Dimension.X - 1;
@@ -118,16 +119,44 @@ public class GridSystem<TGridObject>
 		return Origin + new Vector3(scaledX - offsetX, 0, scaledZ - offsetZ);
 	}
 
-	public TGridObject GetGridObject(Position position)
+	public TGridObject GetGridObject(GridPosition position)
 	{
 		return gridObjects[position.X, position.Z];
 	}
 
-	public Position GetGridPosition(Vector3 worldPosition)
+	public GridPosition GetGridPosition(Vector3 worldPosition)
 	{
-		return new Position((int)(worldPosition.X / UnitScale), (int)(worldPosition.Z / UnitScale));
+		return new GridPosition((int)(worldPosition.X / UnitScale), (int)(worldPosition.Z / UnitScale));
 	}
 
 }
 
 
+public class GridPosition
+{
+	public int X;
+	public int Z;
+
+	public GridPosition(int x, int z)
+	{
+		X = x;
+		Z = z;
+	}
+
+	public static GridPosition operator +(GridPosition a, GridPosition b)
+	{
+		return new GridPosition(a.X + b.X, a.Z + b.Z);
+	}
+
+	public static GridPosition operator -(GridPosition a, GridPosition b)
+	{
+		return new GridPosition(a.X - b.X, a.Z - b.Z);
+	}
+
+
+	public override string ToString()
+	{
+		return $"({X}, {Z})";
+	}
+
+}
