@@ -66,7 +66,20 @@ public class DungeonGenerator : Script
 		}
 		Delaunay delaunay = Delaunay.Triangulate(points);
 
-		// Debug.Log($"Triangles: {delaunay.Triangles.Count}");
+		// Print the triangulation
+		Debug.Log(delaunay.ToString());
+
+		List<Prim.Edge> weightedEdges = new List<Prim.Edge>();
+		foreach (var edge in delaunay.Edges)
+		{
+			Prim.Edge e = new Prim.Edge(edge.A, edge.B);
+			weightedEdges.Add(e);
+		}
+
+		Prim.MinimumSpanningTree(weightedEdges, points[0]);
+
+
+		Delaunay.DebugTriangulation(delaunay, Color.Aqua, Color.Red, 20f, sphereRadius: 2f);
 
 
 	}

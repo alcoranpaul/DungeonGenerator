@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FlaxEngine;
 
 namespace Game;
@@ -14,21 +15,99 @@ public class Delaunay
 {
 
 	public List<Triangle> Triangulation { get; private set; }
-	public List<Edge> Edges { get; private set; }
+	public HashSet<Edge> Edges { get; private set; }
+	public List<Point> Points { get; private set; }
 
 	public Delaunay()
 	{
 		Triangulation = new List<Triangle>();
 	}
 
+	public string EdgesToString()
+	{
+		Debug.Log("Edges count: " + Edges.Count);
+		string retVal = "";
+		List<Edge> edges = Edges.ToList();
+		for (int i = 0; i < edges.Count; i++)
+		{
+
+			Point pointA = edges[i].A;
+			Point pointB = edges[i].B;
+			retVal += $"Edge {i}: {pointA}, {pointB}\n";
+			BoundingSphere sphereA = new(pointA.VPoint, 15f);
+			BoundingSphere sphereB = new(pointB.VPoint, 15f);
+			DebugDraw.DrawSphere(sphereA, Color.BlanchedAlmond, 10f);
+			DebugDraw.DrawSphere(sphereB, Color.BlanchedAlmond, 10f);
+		}
+		return retVal;
+	}
+
+	public override string ToString()
+	{
+		if (Triangulation.Count == 0)
+		{
+			return "No triangles in triangulation";
+		}
+
+		string retVal = "";
+		int pointCount = 0;
+		for (int i = 0; i < Triangulation.Count; i++)
+		{
+
+			Point a = Triangulation[i].A;
+			Point b = Triangulation[i].B;
+			Point c = Triangulation[i].C;
+			retVal += $"Triangle {i}: {a}, {b}, {c}\n";
+			pointCount += 3;
+		}
+		return retVal;
+	}
+
+#if FLAX_EDITOR
+	public static void DebugTriangulation(Delaunay delaunay, Color edgeColor, Color pointColor, float yOffset = 0, float duration = 16f, float sphereRadius = 0.5f)
+	{
+		if (delaunay == null || delaunay.Triangulation == null || delaunay.Triangulation.Count == 0)
+		{
+			return;
+		}
+
+		foreach (var triangle in delaunay.Triangulation)
+		{
+			Vector3 aPoint = triangle.A.VPoint;
+			Vector3 bPoint = triangle.B.VPoint;
+			Vector3 cPoint = triangle.C.VPoint;
+
+			if (yOffset > 0)
+			{
+				aPoint = new Vector3(aPoint.X, aPoint.Y + yOffset, aPoint.Z);
+				bPoint = new Vector3(bPoint.X, bPoint.Y + yOffset, bPoint.Z);
+				cPoint = new Vector3(cPoint.X, cPoint.Y + yOffset, cPoint.Z);
+			}
+
+			DebugDraw.DrawLine(aPoint, bPoint, edgeColor, duration);
+			DebugDraw.DrawLine(bPoint, cPoint, edgeColor, duration);
+			DebugDraw.DrawLine(cPoint, aPoint, edgeColor, duration);
+
+			BoundingSphere sphereA = new(aPoint, sphereRadius);
+			BoundingSphere sphereB = new(bPoint, sphereRadius);
+			BoundingSphere sphereC = new(cPoint, sphereRadius);
+			DebugDraw.DrawSphere(sphereA, pointColor, duration);
+			DebugDraw.DrawSphere(sphereB, pointColor, duration);
+			DebugDraw.DrawSphere(sphereC, pointColor, duration);
+		}
+	}
+#endif
 	/// <summary>
 	/// Triangulate a list of points
 	/// </summary>
 	/// <param name="points"></param>
 	/// <returns></returns>
+	/// <returns></returns>
 	public static Delaunay Triangulate(List<Point> points)
 	{
 		Delaunay delaunay = new Delaunay();
+		delaunay.Edges = new HashSet<Edge>();
+		delaunay.Points = points;
 		delaunay.Generate(points);
 		return delaunay;
 	}
@@ -76,21 +155,14 @@ public class Delaunay
 			triangle.C == superA || triangle.C == superB || triangle.C == superC
 		);
 
+		foreach (var triangle in Triangulation)
+		{
+			Edges.Add(new Edge(triangle.A, triangle.B));
+			Edges.Add(new Edge(triangle.B, triangle.C));
+			Edges.Add(new Edge(triangle.C, triangle.A));
+		}
 
-		// For Debugging
-		// foreach (var triangle in Triangulation)
-		// {
-		// 	DebugDraw.DrawLine(triangle.A.VPoint, triangle.B.VPoint, Color.Red, 16f);
-		// 	DebugDraw.DrawLine(triangle.B.VPoint, triangle.C.VPoint, Color.Red, 16f);
-		// 	DebugDraw.DrawLine(triangle.C.VPoint, triangle.A.VPoint, Color.Red, 16f);
 
-		// 	BoundingSphere sphereA = new BoundingSphere(triangle.A.VPoint, 0.5f);
-		// 	BoundingSphere sphereB = new BoundingSphere(triangle.B.VPoint, 0.5f);
-		// 	BoundingSphere sphereC = new BoundingSphere(triangle.C.VPoint, 0.5f);
-		// 	DebugDraw.DrawSphere(sphereA, Color.Red, 16f);
-		// 	DebugDraw.DrawSphere(sphereB, Color.Red, 16f);
-		// 	DebugDraw.DrawSphere(sphereC, Color.Red, 16f);
-		// }
 
 
 	}
@@ -155,11 +227,12 @@ public class Delaunay
 			Triangle newTriangle = new Triangle(edge.A, edge.B, point);
 			//  add newTri to triangulation
 			Triangulation.Add(newTriangle);
+
 		}
 
 	}
 
-	public class Point
+	public class Point : IEquatable<Point>
 	{
 		public float X;
 		public float Y;
@@ -173,11 +246,41 @@ public class Delaunay
 
 		public override string ToString()
 		{
-			return $"Point: ({X}, {Y})";
+			return $"({X}, {Y})";
 		}
+
+		public static bool operator ==(Point a, Point b)
+		{
+			return (a.X == b.X) && (a.Y == b.Y);
+		}
+		public static bool operator !=(Point a, Point b)
+		{
+			return !(a == b);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj is Point e)
+			{
+				return this == e;
+			}
+
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return X.GetHashCode() ^ Y.GetHashCode();
+		}
+
+		public bool Equals(Point other)
+		{
+			return this == other;
+		}
+
 	}
 
-	public class Edge
+	public class Edge : IEquatable<Edge>
 	{
 		public Point A { get; private set; }
 		public Point B { get; private set; }
@@ -185,6 +288,11 @@ public class Delaunay
 		{
 			A = a;
 			B = b;
+		}
+
+		public override string ToString()
+		{
+			return $"Edge: [{A}, {B}]";
 		}
 
 		public static bool operator ==(Edge a, Edge b)
@@ -209,6 +317,11 @@ public class Delaunay
 		public override int GetHashCode()
 		{
 			return A.GetHashCode() ^ B.GetHashCode();
+		}
+
+		public bool Equals(Edge other)
+		{
+			return this == other;
 		}
 	}
 
