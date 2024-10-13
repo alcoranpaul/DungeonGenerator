@@ -36,25 +36,37 @@ public class DungeonGenerator : Script
 
 	// Reference to the material
 	public MaterialBase Material;
+	public Prefab debugGridPrefab;
+
+	public GridSystem<GridObject> GridSystem { get; private set; }
 
 	public override void OnAwake()
 	{
 		Instance = this;
+
+	}
+
+	public void GenerateGridSystem()
+	{
+		GridSystem = new GridSystem<GridObject>(new Vector2(10, 10), 1, (GridSystem<GridObject> gridSystem, GridSystem<GridObject>.Position gridPosition) => { return new GridObject(gridSystem, gridPosition); });
+
+		GridSystem.CreateDebugObjects(debugGridPrefab);
 	}
 	public override void OnStart()
 	{
 		// modelRooms = new List<Model>();
 		rooms = new List<Room>();
 
-		dungeonBounds = new BoundingBox(new Vector3(-DungeonWidth, -10, -DungeonWidth), new Vector3(DungeonWidth, 10, DungeonWidth));
-		DebugDraw.DrawWireBox(dungeonBounds, Color.Beige, 10.0f);
+
 
 	}
 
 	public void GenerateDungeon()
 	{
 		Debug.Log("Generating dungeon...");
-		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
+		dungeonBounds = new BoundingBox(new Vector3(-DungeonWidth, -10, -DungeonWidth), new Vector3(DungeonWidth, 10, DungeonWidth));
+		DebugDraw.DrawWireBox(dungeonBounds, Color.Beige, 10.0f);
+
 		float debugTime = 60f;
 		DestroyDungeon();
 

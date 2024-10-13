@@ -103,7 +103,8 @@
 			"V": {
 	"MaxRooms": 10,
 	"MinRoomLength": 2,
-	"DungeonWidth": 100
+	"DungeonWidth": 100,
+	"debugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a"
 }
 		},
 		{
@@ -120,6 +121,16 @@
 				}
 			},
 			"V": {}
+		},
+		{
+			"ID": "6e3a93c44ba5e228c8faaa947d61d7d4",
+			"TypeName": "Game.DungeonUI",
+			"ParentID": "b1fd5cef42bcd0d318667b953126794c",
+			"V": {
+	"dungeonControl": "98df231e49e8f5dc512532b86ba3c5db",
+	"gridControl": "e8ea9d3a47df86bf11e6d08e5959f465",
+	"debugControl": "22eaf12e404c350e99394196a8372457"
+}
 		},
 		{
 			"ID": "ca03979e4e8d8236ac724caa6c54bd4f",
@@ -226,7 +237,7 @@
 			"ID": "98df231e49e8f5dc512532b86ba3c5db",
 			"TypeName": "FlaxEngine.UIControl",
 			"ParentID": "ca03979e4e8d8236ac724caa6c54bd4f",
-			"Name": "Button",
+			"Name": "Dungeon",
 			"Transform": {
 				"Translation": {
 					"X": 932.0,
@@ -355,11 +366,267 @@
 }
 		},
 		{
-			"ID": "9fdc801347bd02c57a31b7ac982420d4",
-			"TypeName": "Game.DungeonUI",
-			"ParentID": "98df231e49e8f5dc512532b86ba3c5db",
-			"V": {
-	"generateControl": "98df231e49e8f5dc512532b86ba3c5db"
+			"ID": "e8ea9d3a47df86bf11e6d08e5959f465",
+			"TypeName": "FlaxEngine.UIControl",
+			"ParentID": "ca03979e4e8d8236ac724caa6c54bd4f",
+			"Name": "Grid",
+			"Transform": {
+				"Translation": {
+					"X": 932.0,
+					"Y": 50.0,
+					"Z": 0.0
+				},
+				"Orientation": {
+					"X": -1.0,
+					"Y": -4.371138828673793e-8,
+					"Z": -4.371138828673793e-8,
+					"W": 1.910685465164705e-15
+				}
+			},
+			"Control": "FlaxEngine.GUI.Button",
+			"Data": {
+	"BackgroundColorHighlighted": {
+		"R": 0.32941177,
+		"G": 0.32941177,
+		"B": 0.36078432,
+		"A": 1.0
+	},
+	"BackgroundColorSelected": {
+		"R": 0.0,
+		"G": 0.47843137,
+		"B": 0.8,
+		"A": 1.0
+	},
+	"HasBorder": true,
+	"BorderThickness": 1.0,
+	"BorderColor": {
+		"R": 0.32941177,
+		"G": 0.32941177,
+		"B": 0.36078432,
+		"A": 1.0
+	},
+	"BorderColorHighlighted": {
+		"R": 0.41568628,
+		"G": 0.41568628,
+		"B": 0.45882353,
+		"A": 1.0
+	},
+	"BorderColorSelected": {
+		"R": 0.10980392,
+		"G": 0.5921569,
+		"B": 0.91764706,
+		"A": 1.0
+	},
+	"Text": "Generate Grid",
+	"CaseOption": 0,
+	"Bold": false,
+	"Italic": false,
+	"TextColor": {
+		"R": 1.0,
+		"G": 1.0,
+		"B": 1.0,
+		"A": 1.0
+	},
+	"TextColorHighlighted": {
+		"R": 1.0,
+		"G": 1.0,
+		"B": 1.0,
+		"A": 1.0
+	},
+	"HorizontalAlignment": 1,
+	"VerticalAlignment": 1,
+	"Wrapping": 0,
+	"BaseLinesGapScale": 1.0,
+	"Font": {
+		"Font": "4508d98f4aa1f0bd59362b81d47e38f4",
+		"Size": 9.0
+	},
+	"Material": null,
+	"Margin": {
+		"Left": 0.0,
+		"Right": 0.0,
+		"Top": 0.0,
+		"Bottom": 0.0
+	},
+	"ClipText": false,
+	"AutoWidth": false,
+	"AutoHeight": false,
+	"AutoFitText": false,
+	"AutoFitTextRange": {
+		"X": 0.1,
+		"Y": 100.0
+	},
+	"ClipChildren": true,
+	"CullChildren": true,
+	"AnchorMin": {
+		"X": 1.0,
+		"Y": 0.0
+	},
+	"AnchorMax": {
+		"X": 1.0,
+		"Y": 0.0
+	},
+	"Offsets": {
+		"Left": -148.0,
+		"Right": 120.0,
+		"Top": 50.0,
+		"Bottom": 24.0
+	},
+	"Scale": {
+		"X": 1.0,
+		"Y": 1.0
+	},
+	"Pivot": {
+		"X": 1.0,
+		"Y": 0.0
+	},
+	"Shear": {
+		"X": 0.0,
+		"Y": 0.0
+	},
+	"Rotation": 0.0,
+	"BackgroundColor": {
+		"R": 0.24705882,
+		"G": 0.24705882,
+		"B": 0.27450982,
+		"A": 1.0
+	},
+	"BackgroundBrush": null,
+	"Enabled": true,
+	"Visible": true,
+	"AutoFocus": true
+}
+		},
+		{
+			"ID": "22eaf12e404c350e99394196a8372457",
+			"TypeName": "FlaxEngine.UIControl",
+			"ParentID": "ca03979e4e8d8236ac724caa6c54bd4f",
+			"Name": "Clear Debug",
+			"Transform": {
+				"Translation": {
+					"X": 932.0,
+					"Y": 86.0,
+					"Z": 0.0
+				},
+				"Orientation": {
+					"X": -1.0,
+					"Y": -4.371138828673793e-8,
+					"Z": -4.371138828673793e-8,
+					"W": 1.910685465164705e-15
+				}
+			},
+			"Control": "FlaxEngine.GUI.Button",
+			"Data": {
+	"BackgroundColorHighlighted": {
+		"R": 0.32941177,
+		"G": 0.32941177,
+		"B": 0.36078432,
+		"A": 1.0
+	},
+	"BackgroundColorSelected": {
+		"R": 0.0,
+		"G": 0.47843137,
+		"B": 0.8,
+		"A": 1.0
+	},
+	"HasBorder": true,
+	"BorderThickness": 1.0,
+	"BorderColor": {
+		"R": 0.32941177,
+		"G": 0.32941177,
+		"B": 0.36078432,
+		"A": 1.0
+	},
+	"BorderColorHighlighted": {
+		"R": 0.41568628,
+		"G": 0.41568628,
+		"B": 0.45882353,
+		"A": 1.0
+	},
+	"BorderColorSelected": {
+		"R": 0.10980392,
+		"G": 0.5921569,
+		"B": 0.91764706,
+		"A": 1.0
+	},
+	"Text": "Clear Debug Draw",
+	"CaseOption": 0,
+	"Bold": false,
+	"Italic": false,
+	"TextColor": {
+		"R": 1.0,
+		"G": 1.0,
+		"B": 1.0,
+		"A": 1.0
+	},
+	"TextColorHighlighted": {
+		"R": 1.0,
+		"G": 1.0,
+		"B": 1.0,
+		"A": 1.0
+	},
+	"HorizontalAlignment": 1,
+	"VerticalAlignment": 1,
+	"Wrapping": 0,
+	"BaseLinesGapScale": 1.0,
+	"Font": {
+		"Font": "4508d98f4aa1f0bd59362b81d47e38f4",
+		"Size": 9.0
+	},
+	"Material": null,
+	"Margin": {
+		"Left": 0.0,
+		"Right": 0.0,
+		"Top": 0.0,
+		"Bottom": 0.0
+	},
+	"ClipText": false,
+	"AutoWidth": false,
+	"AutoHeight": false,
+	"AutoFitText": false,
+	"AutoFitTextRange": {
+		"X": 0.1,
+		"Y": 100.0
+	},
+	"ClipChildren": true,
+	"CullChildren": true,
+	"AnchorMin": {
+		"X": 1.0,
+		"Y": 0.0
+	},
+	"AnchorMax": {
+		"X": 1.0,
+		"Y": 0.0
+	},
+	"Offsets": {
+		"Left": -148.0,
+		"Right": 120.0,
+		"Top": 86.0,
+		"Bottom": 24.0
+	},
+	"Scale": {
+		"X": 1.0,
+		"Y": 1.0
+	},
+	"Pivot": {
+		"X": 1.0,
+		"Y": 0.0
+	},
+	"Shear": {
+		"X": 0.0,
+		"Y": 0.0
+	},
+	"Rotation": 0.0,
+	"BackgroundColor": {
+		"R": 0.24705882,
+		"G": 0.24705882,
+		"B": 0.27450982,
+		"A": 1.0
+	},
+	"BackgroundBrush": null,
+	"Enabled": true,
+	"Visible": true,
+	"AutoFocus": true
 }
 		}
 	]
