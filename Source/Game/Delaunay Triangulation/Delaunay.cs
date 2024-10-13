@@ -64,7 +64,7 @@ public class Delaunay
 	}
 
 #if FLAX_EDITOR
-	public static void DebugTriangulation(Delaunay delaunay, Color edgeColor, Color pointColor, float yOffset = 0, float duration = 16f, float sphereRadius = 0.5f)
+	public static void DebugTriangulation(Delaunay delaunay, Color edgeColor, Color pointColor, float yOffset = 20, float duration = 16f, float sphereRadius = 2f)
 	{
 		if (delaunay == null || delaunay.Triangulation == null || delaunay.Triangulation.Count == 0)
 		{
@@ -113,7 +113,7 @@ public class Delaunay
 	}
 
 	/// <summary>
-	/// Generate the Delaunay triangulation
+	/// Generate the Delaunay triangulation: O(n)
 	/// </summary>
 	/// <param name="points"></param>
 	public void Generate(List<Point> points)

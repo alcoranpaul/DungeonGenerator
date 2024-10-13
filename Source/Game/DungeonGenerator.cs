@@ -74,12 +74,14 @@ public class DungeonGenerator : Script
 		{
 			Prim.Edge e = new Prim.Edge(edge.A, edge.B);
 			weightedEdges.Add(e);
+			DebugDraw.DrawText($"{e.Distance}", (edge.A.VPoint + edge.B.VPoint) / 2, Color.DarkRed, 8, 20f, 0.5f);
 		}
 
-		Prim.MinimumSpanningTree(weightedEdges, points[0]);
+		List<Prim.Edge> mst = Prim.MinimumSpanningTree(weightedEdges, points[0]);
 
 
-		Delaunay.DebugTriangulation(delaunay, Color.Aqua, Color.Red, 20f, sphereRadius: 2f);
+		Prim.DebugMST(mst, Color.Yellow);
+		Delaunay.DebugTriangulation(delaunay, Color.Aqua, Color.Red);
 
 
 	}
