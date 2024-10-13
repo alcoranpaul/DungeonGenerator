@@ -10,11 +10,11 @@ namespace Game;
 public class GridDebugObject : Script
 {
 	public TextRender TextRender;
-	protected object _gridObject;
+	public object GridObject { get; protected set; }
 
 	public virtual void SetGridObject(object gridObject)
 	{
-		_gridObject = gridObject;
+		GridObject = gridObject;
 	}
 	protected virtual void SetText(string text)
 	{

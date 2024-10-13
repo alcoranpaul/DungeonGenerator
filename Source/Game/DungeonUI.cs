@@ -21,6 +21,8 @@ public class DungeonUI : Script
 
 	public InputEvent TestEvent = new InputEvent("Test");
 
+	public Actor mouseActor;
+
 	public override void OnAwake()
 	{
 		if (dungeonControl == null || !dungeonControl.Is<Button>())
@@ -53,15 +55,29 @@ public class DungeonUI : Script
 		TestEvent.Pressed += CalculatePath;
 	}
 
+
+
 	private void CalculatePath()
 	{
 		var pos = Input.MousePosition;
 		var ray = Camera.MainCamera.ConvertMouseToRay(pos);
 		if (Physics.RayCast(ray.Position, ray.Direction, out RayCastHit hit))
 		{
-			Debug.Log($"Mouse hit: {hit.Point}");
-			// GridSystem<Pathfinding.PathNode>.Position gridPos = new GridSystem<Pathfinding.PathNode>.Position(hit.Point);
-			// DungeonGenerator.Instance.GridSystem.GetWorldPosition()
+
+			mouseActor.Position = hit.Point;
+			GridPosition startingGridPos = new GridPosition(0, 0);
+			GridPosition endPos = DungeonGenerator.Instance.Pathfinding.GridSystem.GetGridPosition(hit.Point);
+			List<GridPosition> paths = DungeonGenerator.Instance.Pathfinding.FindPath(startingGridPos, endPos);
+
+			for (int i = 0; i < paths.Count - 1; i++)
+			{
+				DebugDraw.DrawLine(
+					DungeonGenerator.Instance.Pathfinding.GridSystem.GetWorldPosition(paths[i]),
+					DungeonGenerator.Instance.Pathfinding.GridSystem.GetWorldPosition(paths[i + 1]),
+					Color.Red,
+					10f
+				);
+			}
 		}
 
 	}

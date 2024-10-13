@@ -17,23 +17,33 @@ public class PathfindingDebugObject : GridDebugObject
 	public override void SetGridObject(object gridObject)
 	{
 		base.SetGridObject(gridObject);
-		pathNode = _gridObject as Pathfinding.PathNode;
-		pathNode.OnDataChanged += (sender, e) => SetText(pathNode.Position.ToString());
-		SetText(pathNode.Position.ToString());
+		pathNode = GridObject as Pathfinding.PathNode;
+		pathNode.OnDataChanged += (sender, e) => SetText(pathNode.GridPosition.ToString());
+		SetText(pathNode.GridPosition.ToString());
 
 	}
 
 	protected override void SetText(string text)
 	{
 		base.SetText(text);
-		gCost.Text = pathNode.GCost.ToString();
-		hCost.Text = pathNode.HCost.ToString();
-		fCost.Text = pathNode.FCost.ToString();
+		if (pathNode.IsWalkable)
+		{
+			gCost.Text = pathNode.GCost.ToString();
+			hCost.Text = pathNode.HCost.ToString();
+			fCost.Text = pathNode.FCost.ToString();
+		}
+		else
+		{
+			gCost.Text = "-";
+			hCost.Text = "-";
+			fCost.Text = "-";
+		}
+
 	}
 
 	public override void OnDestroy()
 	{
-		pathNode.OnDataChanged -= (sender, e) => SetText(pathNode.Position.ToString());
+		pathNode.OnDataChanged -= (sender, e) => SetText(pathNode.GridPosition.ToString());
 		base.OnDestroy();
 	}
 }
