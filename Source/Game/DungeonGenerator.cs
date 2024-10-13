@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using FlaxEngine;
+using FlaxEngine.Utilities;
 
 namespace Game;
 
@@ -53,7 +54,8 @@ public class DungeonGenerator : Script
 	public void GenerateDungeon()
 	{
 		Debug.Log("Generating dungeon...");
-
+		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
+		float debugTime = 60f;
 		DestroyDungeon();
 
 		SpawnRooms();
@@ -74,14 +76,24 @@ public class DungeonGenerator : Script
 		{
 			Prim.Edge e = new Prim.Edge(edge.A, edge.B);
 			weightedEdges.Add(e);
-			DebugDraw.DrawText($"{e.Distance}", (edge.A.VPoint + edge.B.VPoint) / 2, Color.DarkRed, 8, 20f, 0.5f);
+			DebugDraw.DrawText($"{e.Distance}", (edge.A.VPoint + edge.B.VPoint) / 2, Color.DarkRed, 8, debugTime, 0.5f);
 		}
 
-		List<Prim.Edge> mst = Prim.MinimumSpanningTree(weightedEdges, points[0]);
+		List<Delaunay.Edge> mst = Prim.MinimumSpanningTree(weightedEdges, points[0]);
+		// Delaunay.Edge.DebugEdges(mst, Color.Yellow, duration: debugTime);
 
+		// Add more edges to the MST
+		foreach (var edge in delaunay.Edges)
+		{
+			if (mst.Contains(edge)) continue;
 
-		Prim.DebugMST(mst, Color.Yellow);
-		Delaunay.DebugTriangulation(delaunay, Color.Aqua, Color.Red);
+			float rand = Random.Shared.NextFloat();
+			if (rand < 0.451f)
+				mst.Add(edge);
+		}
+
+		Delaunay.Edge.DebugEdges(mst, Color.DarkBlue, 40f);
+		// Delaunay.DebugTriangulation(delaunay, Color.Aqua, Color.Red, duration: debugTime);
 
 
 	}

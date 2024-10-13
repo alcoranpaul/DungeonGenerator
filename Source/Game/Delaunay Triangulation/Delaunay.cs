@@ -290,6 +290,18 @@ public class Delaunay
 			B = b;
 		}
 
+		public static void DebugEdges(List<Edge> edges, Color color, float yOffset = 30f, float duration = 20f)
+		{
+			// Draw edges or any other post-processing
+			foreach (var edge in edges)
+			{
+				Debug.Log(edge);
+				Vector3 a = new Vector3(edge.A.X, yOffset, edge.A.Y);
+				Vector3 b = new Vector3(edge.B.X, yOffset, edge.B.Y);
+				DebugDraw.DrawLine(a, b, color, duration);
+			}
+		}
+
 		public override string ToString()
 		{
 			return $"Edge: [{A}, {B}]";
