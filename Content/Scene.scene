@@ -65,9 +65,9 @@
 			"Name": "Camera",
 			"Transform": {
 				"Translation": {
-					"X": 0.0,
-					"Y": 1958.93310546875,
-					"Z": -61.07401657104492
+					"X": 231.34292602539063,
+					"Y": 3388.689697265625,
+					"Z": 50.189430236816409
 				},
 				"Orientation": {
 					"X": 0.6946583986282349,
@@ -101,9 +101,9 @@
 			"TypeName": "Game.DungeonGenerator",
 			"ParentID": "d9a4423548697513afee19b9b7808d07",
 			"V": {
-	"MaxRooms": 10,
+	"MaxRooms": 15,
 	"roomScale": 20.0,
-	"DungeonSize": 25,
+	"DungeonSize": 30,
 	"Material": "da45912f498bb524b428f3ad9b2e4c0c",
 	"debugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a",
 	"pathfindingDebugPrefab": "b71b10e044f0a7eb83c1a99fda4c90a1",
@@ -142,6 +142,13 @@
 			"TypeName": "FlaxEngine.UIControl",
 			"ParentID": "b1fd5cef42bcd0d318667b953126794c",
 			"Name": "Canvas Scalar",
+			"Transform": {
+				"Translation": {
+					"X": -2.0,
+					"Y": 0.0,
+					"Z": 0.0
+				}
+			},
 			"Control": "FlaxEngine.GUI.CanvasScaler",
 			"Data": {
 	"ResolutionCurve": {
@@ -188,7 +195,7 @@
 	"ScaleFactor": 1.0,
 	"PhysicalUnit": 3,
 	"PhysicalUnitSize": 1.0,
-	"ResolutionMode": 1,
+	"ResolutionMode": 3,
 	"ResolutionMin": {
 		"X": 1920.0,
 		"Y": 1080.0
@@ -208,8 +215,8 @@
 		"Y": 1.0
 	},
 	"Offsets": {
-		"Left": 0.0,
-		"Right": 0.0,
+		"Left": -2.0,
+		"Right": 2.0,
 		"Top": 0.0,
 		"Bottom": 0.0
 	},
@@ -245,7 +252,7 @@
 			"Name": "Dungeon",
 			"Transform": {
 				"Translation": {
-					"X": 932.0,
+					"X": 1772.0,
 					"Y": 17.0,
 					"Z": 0.0
 				},
@@ -377,7 +384,7 @@
 			"Name": "Grid",
 			"Transform": {
 				"Translation": {
-					"X": 932.0,
+					"X": 1772.0,
 					"Y": 50.0,
 					"Z": 0.0
 				},
@@ -509,7 +516,7 @@
 			"Name": "Clear Debug",
 			"Transform": {
 				"Translation": {
-					"X": 932.0,
+					"X": 1772.0,
 					"Y": 86.0,
 					"Z": 0.0
 				},

@@ -235,20 +235,17 @@ public class Pathfinding
 
 				if (!neighbor.IsWalkable)
 				{
+					neighbor.NodeType = NodeType.Hallway;
 					closedList.Add(neighbor);
 					continue;
 				}
 
 				// Cost from the start node to the current node
 				int tentativeGCost = currentNode.GCost + CalculateDistance(currentNode.GridPosition, neighbor.GridPosition);
-				// if (currentNode.NodeType == NodeType.Hallway)
-				// {
-				// 	tentativeGCost = -5;
-				// }
-				// else
-				// {
-				// 	tentativeGCost = currentNode.GCost + CalculateDistance(currentNode.GridPosition, neighbor.GridPosition) + 10;
-				// }
+				if (currentNode.NodeType == NodeType.Hallway)
+				{
+					tentativeGCost = -5;
+				}
 
 
 				if (tentativeGCost < neighbor.GCost)  // If the new path is shorter
@@ -278,16 +275,21 @@ public class Pathfinding
 			{
 				for (int z = -radius; z <= radius; z++)
 				{
+					// Skip diagonal nodes: only check when either X or Z offset is 0
+					if (Math.Abs(x) != 0 && Math.Abs(z) != 0) continue;
 
-					if (node.GridPosition.X + x < 0 || node.GridPosition.Z + z < 0) continue;
 					GridPosition newPos = new GridPosition(node.GridPosition.X + x, node.GridPosition.Z + z);
-					// Debug.Log($"Checking neighbor at {newPos}");
+
+					// Skip if the position is outside the grid bounds
+					if (!GridSystem.IsPositionValid(newPos)) continue;
+
+					// Get the neighbor node
 					PathNode neighborNode = GetNode(newPos);
-					// Debug.Log($"Neighbor node is {neighborNode}");
+
+					// If the neighbor is walkable, return it
 					if (neighborNode != null && neighborNode.IsWalkable)
 					{
-						// Debug.Log($"Found walkable node at {neighborNode.GridPosition}");
-						return neighborNode; // Return the first walkable node found
+						return neighborNode;
 					}
 				}
 			}
@@ -295,6 +297,7 @@ public class Pathfinding
 
 		return null; // No walkable node found within the search radius
 	}
+
 
 
 
@@ -307,22 +310,22 @@ public class Pathfinding
 
 		if (GridSystem.IsPositionXValid(position.X - 1))
 		{
-			Debug.Log($"Left: {position.X - 1} {position.Z}");
+
 			neighboringNodes.Add(GetNode(position.X - 1, position.Z)); // Left
-			if (GridSystem.IsPositionZValid(position.Z - 1))
-				neighboringNodes.Add(GetNode(position.X - 1, position.Z - 1)); // Down Left
-			if (GridSystem.IsPositionZValid(position.Z + 1))
-				neighboringNodes.Add(GetNode(position.X - 1, position.Z + 1)); // Up Left
+																	   // if (GridSystem.IsPositionZValid(position.Z - 1))
+																	   // 	neighboringNodes.Add(GetNode(position.X - 1, position.Z - 1)); // Down Left
+																	   // if (GridSystem.IsPositionZValid(position.Z + 1))
+																	   // 	neighboringNodes.Add(GetNode(position.X - 1, position.Z + 1)); // Up Left
 		}
 
 
 		if (GridSystem.IsPositionXValid(position.X + 1))
 		{
 			neighboringNodes.Add(GetNode(position.X + 1, position.Z)); // Right
-			if (GridSystem.IsPositionZValid(position.Z - 1))
-				neighboringNodes.Add(GetNode(position.X + 1, position.Z - 1)); // Down Right
-			if (GridSystem.IsPositionZValid(position.Z + 1))
-				neighboringNodes.Add(GetNode(position.X + 1, position.Z + 1)); // Up Right	
+																	   // if (GridSystem.IsPositionZValid(position.Z - 1))
+																	   // 	neighboringNodes.Add(GetNode(position.X + 1, position.Z - 1)); // Down Right
+																	   // if (GridSystem.IsPositionZValid(position.Z + 1))
+																	   // 	neighboringNodes.Add(GetNode(position.X + 1, position.Z + 1)); // Up Right	
 		}
 
 		if (GridSystem.IsPositionZValid(position.Z - 1))
@@ -336,7 +339,6 @@ public class Pathfinding
 		{
 			neighbors += n.GridPosition + " ";
 		}
-		Debug.Log($"Neighbors of {node.GridPosition}: {neighbors}");
 		return neighboringNodes;
 	}
 
@@ -391,7 +393,7 @@ public class Pathfinding
 		int xDistance = Math.Abs(gridPosDistance.X);
 		int zDistance = Math.Abs(gridPosDistance.Z);
 		int remaining = Math.Abs(xDistance - zDistance);
-
-		return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, zDistance) + (remaining * MOVE_STRAIGHT_COST);
+		// MOVE_DIAGONAL_COST * Mathf.Min(xDistance, zDistance) + (remaining * MOVE_STRAIGHT_COST);
+		return xDistance + zDistance;
 	}
 }
