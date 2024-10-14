@@ -65,15 +65,15 @@
 			"Name": "Camera",
 			"Transform": {
 				"Translation": {
-					"X": -8.817219734191895,
-					"Y": 1036.27001953125,
-					"Z": 460.9332580566406
+					"X": 0.0,
+					"Y": 1958.93310546875,
+					"Z": -61.07401657104492
 				},
 				"Orientation": {
-					"X": 0.004766086582094431,
-					"Y": -0.8030377626419067,
-					"Z": 0.5958744883537293,
-					"W": 0.006423076614737511
+					"X": 0.6946583986282349,
+					"Y": 0.0,
+					"Z": 0.0,
+					"W": 0.7193397879600525
 				}
 			}
 		},
@@ -103,11 +103,12 @@
 			"V": {
 	"MaxRooms": 10,
 	"roomScale": 20.0,
-	"DungeonSize": 20,
+	"DungeonSize": 25,
 	"Material": "da45912f498bb524b428f3ad9b2e4c0c",
 	"debugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a",
 	"pathfindingDebugPrefab": "b71b10e044f0a7eb83c1a99fda4c90a1",
-	"roomPrefab": "f3d896034ca9a3f0966afe81c047c45e"
+	"roomPrefab": "f3d896034ca9a3f0966afe81c047c45e",
+	"floorPrefab": "3e10e49441a0137931b654a1c18b11b7"
 }
 		},
 		{

@@ -10,6 +10,12 @@ namespace Game;
 /// </summary>
 public class Pathfinding
 {
+	public enum NodeType
+	{
+		Hallway,
+		Room,
+		Other
+	}
 
 	public class PathNode : IGridObject
 	{
@@ -24,6 +30,7 @@ public class Pathfinding
 		public bool IsWalkable { get; private set; }
 
 		public event EventHandler OnDataChanged;
+		public NodeType NodeType { get; set; }  // New property to define node type
 
 		public PathNode(GridPosition position, GridSystem<PathNode> gridSystem)
 		{
@@ -105,46 +112,81 @@ public class Pathfinding
 
 	public void ToggleNeighborWalkable(GridPosition basePosition, int Width, int Length, bool flag)
 	{
-
+		Debug.Log($"GridPosition: {basePosition} - {Width} X {Length}... GridSize: {GridSystem.ToGridSize(Width)} X {GridSystem.ToGridSize(Length)}");
 		ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z), flag);
 		if (Width > 1)
 		{
-			// Left and Right
-			for (int i = 1; i < Width; i++)
+			bool isDivisible = Width % 2 == 0; // Is divisible by 2
+
+			if (isDivisible)
 			{
-
-				ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z), flag);
-				ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z), flag);
-
-
+				for (int i = 1; i <= Width / 2; i++)
+				{
+					ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z), flag);
+					ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z), flag);
+				}
 			}
+			else
+			{
+				for (int i = 1; i < Width - 1; i++)
+				{
+					ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z), flag);
+					ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z), flag);
+				}
+			}
+			// int endCount = (Width % 2 != 0) ? Width - 1 : Width / 2;
+			// // Left and Right
+			// for (int i = 1; i < endCount; i++)
+			// {
+			// 	ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z), flag);
+			// 	ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z), flag);
+			// }
 		}
 
 		if (Length > 1)
 		{
-			// Forward and Backward
-			for (int i = 1; i < Length; i++)
-			{
-				ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z + i), flag);
-				ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z - i), flag);
+			bool isDivisible = Length % 2 == 0; // Is divisible by 2
 
+			if (isDivisible)
+			{
+				for (int i = 1; i <= Length / 2; i++)
+				{
+					ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z + i), flag);
+					ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z - i), flag);
+				}
 			}
+			else
+			{
+				for (int i = 1; i < Length - 1; i++)
+				{
+					ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z + i), flag);
+					ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z - i), flag);
+				}
+			}
+			// int endCount = (Length % 2 != 0) ? Length - 1 : Length / 2;
+			// // Forward and Backward
+			// for (int i = 1; i < endCount; i++)
+			// {
+			// 	ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z + i), flag);
+			// 	ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z - i), flag);
+
+			// }
 
 
 		}
 
-		if (Width > 1 && Length > 1)
-		{
-			// Diagonal
-			for (int i = 1; i < Width; i++)
-			{
-				ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z + i), flag);
-				ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z - i), flag);
-				ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z - i), flag);
-				ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z + i), flag);
-
-			}
-		}
+		// if (Width > 1 && Length > 1)
+		// {
+		// 	int count = 1;
+		// 	// Diagonal
+		// 	for (int i = 1; i < Width; i++)
+		// 	{
+		// 		ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z + i), flag);
+		// 		ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z - i), flag);
+		// 		ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z - i), flag);
+		// 		ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z + i), flag);
+		// 	}
+		// }
 	}
 
 	private void ToggleNodeWalkable(GridPosition position, bool flag)
@@ -193,10 +235,12 @@ public class Pathfinding
 			}
 		}
 
+
+
 		openList.Add(startNode);
-		Debug.Log($"Start: {startNode.GridPosition} End: {endNode.GridPosition}");
-		DebugDraw.DrawSphere(new BoundingSphere(GridSystem.GetWorldPosition(startNode.GridPosition), 15f), Color.DarkRed, 10f);
-		DebugDraw.DrawSphere(new BoundingSphere(GridSystem.GetWorldPosition(endNode.GridPosition), 15f), Color.DarkRed, 10f);
+		// Debug.Log($"Start: {startNode.GridPosition} End: {endNode.GridPosition}");
+		DebugDraw.DrawSphere(new BoundingSphere(GridSystem.GetWorldPosition(startNode.GridPosition), 15f), Color.DarkRed, 60f);
+		DebugDraw.DrawSphere(new BoundingSphere(GridSystem.GetWorldPosition(endNode.GridPosition), 15f), Color.DarkRed, 60f);
 
 
 		// Initialize path nodes
@@ -238,7 +282,16 @@ public class Pathfinding
 				}
 
 				// Cost from the start node to the current node
-				int tentativeGCost = currentNode.GCost + CalculateDistance(currentNode.GridPosition, neighbor.GridPosition);
+				int tentativeGCost;
+				if (currentNode.NodeType == NodeType.Hallway)
+				{
+					tentativeGCost = -5;
+				}
+				else
+				{
+					tentativeGCost = currentNode.GCost + CalculateDistance(currentNode.GridPosition, neighbor.GridPosition) + 10;
+				}
+
 
 				if (tentativeGCost < neighbor.GCost)  // If the new path is shorter
 				{

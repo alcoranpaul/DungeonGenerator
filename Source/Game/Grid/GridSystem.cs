@@ -80,6 +80,13 @@ public class GridSystem<TGridObject>
 		DrawGridBoundingBox();
 	}
 
+	public int ToGridSize(int worldSize)
+	{
+		if (worldSize % 2 != 0) return worldSize;
+		else return worldSize + 1;
+	}
+
+
 	public BoundingBox GetBoundingBox()
 	{
 		BoundingBox gridBounds = GetBoundingBox(out Vector3 minWorldPos, out Vector3 maxWorldPos);

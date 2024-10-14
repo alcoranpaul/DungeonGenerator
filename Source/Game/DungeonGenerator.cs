@@ -20,7 +20,7 @@ public class DungeonGenerator : Script
 
 	public int DungeonSize = 10;
 
-	public float RoomSizeOffset = 0.7f;
+
 
 	// private List<Model> modelRooms;
 	public List<Room> rooms;
@@ -34,6 +34,7 @@ public class DungeonGenerator : Script
 	public Prefab debugGridPrefab;
 	public Prefab pathfindingDebugPrefab;
 	public Prefab roomPrefab;
+	public Prefab floorPrefab;
 
 	// public GridSystem<GridObject> GridSystem { get; private set; }
 	public Pathfinding Pathfinding { get; private set; }
@@ -61,9 +62,13 @@ public class DungeonGenerator : Script
 		rooms = new List<Room>();
 
 		Pathfinding = new Pathfinding(new Vector2(DungeonSize, DungeonSize), 1);
-		// Pathfinding.SpawnDebugObjects(pathfindingDebugPrefab);
+		SpawnDebug();
 	}
 
+	public void SpawnDebug()
+	{
+		Pathfinding.SpawnDebugObjects(pathfindingDebugPrefab);
+	}
 
 	public void GenerateDungeon()
 	{
@@ -72,15 +77,32 @@ public class DungeonGenerator : Script
 		// Draw Boundary Box
 		dungeonBounds = Pathfinding.GetBoundingBox();
 		DebugDraw.DrawWireBox(dungeonBounds, Color.Beige, 10.0f);
-		float debugTime = 60f;
+
 
 		DestroyDungeon();
 		SpawnRooms();
+		GenerateHallwayPaths();
 
+	}
+
+	private void GenerateHallwayPaths()
+	{
+		Debug.Log($"Generating Hallways");
+		float debugTime = 60f;
 		List<Delaunay.Point> points = new List<Delaunay.Point>();
 		HashSet<Delaunay.Edge> edges = CreateDelaunayTriangulation(points);
 
 		List<Delaunay.Edge> hallwayPaths = CalculatePaths(debugTime, points, edges);
+
+		// Set Node type to hallway nodes
+		foreach (var edge in hallwayPaths)
+		{
+			GridPosition startingPos = Pathfinding.GridSystem.GetGridPosition(edge.A.VPoint);
+			GridPosition end = Pathfinding.GridSystem.GetGridPosition(edge.B.VPoint);
+
+			Pathfinding.GetNode(startingPos).NodeType = Pathfinding.NodeType.Hallway;
+			Pathfinding.GetNode(end).NodeType = Pathfinding.NodeType.Hallway;
+		}
 
 		foreach (var edge in hallwayPaths)
 		{
@@ -88,34 +110,38 @@ public class DungeonGenerator : Script
 			GridPosition end = Pathfinding.GridSystem.GetGridPosition(edge.B.VPoint);
 
 			List<GridPosition> paths = Pathfinding.FindPath(startingPos, end);
-			Debug.Log($"Path count: {paths.Count}");
+			if (paths == null) continue;
+			// Debug.Log($"Path count: {paths.Count}");
 			for (int i = 0; i < paths.Count - 1; i++)
 			{
+				Actor floor1 = PrefabManager.SpawnPrefab(floorPrefab, Pathfinding.GridSystem.GetWorldPosition(paths[i]), Quaternion.Identity);
+				Actor floot2 = PrefabManager.SpawnPrefab(floorPrefab, Pathfinding.GridSystem.GetWorldPosition(paths[i + 1]), Quaternion.Identity);
+				floor1.Parent = Actor;
+				floot2.Parent = Actor;
 				DebugDraw.DrawLine(
 					Pathfinding.GridSystem.GetWorldPosition(paths[i]),
 					Pathfinding.GridSystem.GetWorldPosition(paths[i + 1]),
 					Color.Red,
-					10f
+					60f
 				);
 			}
 		}
-
 	}
 
 	private List<Delaunay.Edge> CalculatePaths(float debugTime, List<Delaunay.Point> points, HashSet<Delaunay.Edge> edges)
 	{
-		Debug.Log("Calculating MST ...");
+		// Debug.Log("Calculating MST ...");
 		List<Prim.Edge> weightedEdges = new List<Prim.Edge>();
 		foreach (var edge in edges)
 		{
 			Prim.Edge e = new Prim.Edge(edge.A, edge.B);
 			weightedEdges.Add(e);
-			DebugDraw.DrawText($"{e.Distance}", (edge.A.VPoint + edge.B.VPoint) / 2, Color.DarkRed, 8, debugTime, 0.5f);
+			// DebugDraw.DrawText($"{e.Distance}", (edge.A.VPoint + edge.B.VPoint) / 2, Color.DarkRed, 8, debugTime, 0.5f);
 		}
 
 		List<Delaunay.Edge> finalPaths = Prim.MinimumSpanningTree(weightedEdges, points[0]);
 
-		Debug.Log($"Adding more paths into MST ..." + finalPaths.Count);
+		// Debug.Log($"Adding more paths into MST ..." + finalPaths.Count);
 		// Add more edges to the MST
 		foreach (var edge in edges)
 		{
@@ -126,14 +152,14 @@ public class DungeonGenerator : Script
 				finalPaths.Add(edge);
 		}
 
-		Delaunay.Edge.DebugEdges(finalPaths, Color.DarkBlue, 40f);
+		// Delaunay.Edge.DebugEdges(finalPaths, Color.DarkBlue, 40f);
 
 		return finalPaths;
 	}
 
 	private HashSet<Delaunay.Edge> CreateDelaunayTriangulation(List<Delaunay.Point> points)
 	{
-		Debug.Log("Calculating Delaunay Triangulation...");
+		// Debug.Log("Calculating Delaunay Triangulation...");
 		foreach (var room in rooms)
 		{
 			Delaunay.Point point = new Delaunay.Point(room.WorldPosition.X, room.WorldPosition.Z);
@@ -158,9 +184,9 @@ public class DungeonGenerator : Script
 		Random rand = new Random();
 
 
-		int Width = rand.Next(1, 2);
+		int Width = rand.Next(2, 5);
 		int Height = rand.Next(1, 2);
-		int Length = rand.Next(1, 3);
+		int Length = rand.Next(2, 5);
 
 		bool isPositionValid = FindValidRoomPosition(Width, Height, Length, out Vector3 position);
 
@@ -272,7 +298,7 @@ public class DungeonGenerator : Script
 
 			return true;
 		}
-		// Debug.Log($"Invalid room position, trying again... {maxAttemps - 1}");
+		Debug.Log($"Invalid room position, trying again... {maxAttemps - 1}");
 
 		return FindValidRoomPosition(Width, Height, Length, --maxAttemps, out _position);
 
