@@ -81,7 +81,7 @@ public class DungeonGenerator : Script
 
 		DestroyDungeon();
 		SpawnRooms();
-		GenerateHallwayPaths();
+		// GenerateHallwayPaths();
 
 	}
 
@@ -91,9 +91,9 @@ public class DungeonGenerator : Script
 		float debugTime = 60f;
 		List<Delaunay.Point> points = new List<Delaunay.Point>();
 		HashSet<Delaunay.Edge> edges = CreateDelaunayTriangulation(points);
-
+		// Debug.Log($"Edges count: {edges.Count}");
 		List<Delaunay.Edge> hallwayPaths = CalculatePaths(debugTime, points, edges);
-
+		// Debug.Log($"Hallway Paths count: {hallwayPaths.Count}");
 		// Set Node type to hallway nodes
 		foreach (var edge in hallwayPaths)
 		{
@@ -159,13 +159,15 @@ public class DungeonGenerator : Script
 
 	private HashSet<Delaunay.Edge> CreateDelaunayTriangulation(List<Delaunay.Point> points)
 	{
-		// Debug.Log("Calculating Delaunay Triangulation...");
+		Debug.Log("Calculating Delaunay Triangulation...");
+		// Debug.Log($"Rooms count: {rooms.Count}");
 		foreach (var room in rooms)
 		{
 			Delaunay.Point point = new Delaunay.Point(room.WorldPosition.X, room.WorldPosition.Z);
 			points.Add(point);
 		}
 		Delaunay delaunay = Delaunay.Triangulate(points);
+		Debug.Log(delaunay);
 		return delaunay.Edges;
 	}
 
@@ -191,7 +193,7 @@ public class DungeonGenerator : Script
 		bool isPositionValid = FindValidRoomPosition(Width, Height, Length, out Vector3 position);
 
 		if (!isPositionValid) Debug.LogError("Invalid room position");
-
+		Debug.Log($"Valid position at {position}");
 		Actor childModel = PrefabManager.SpawnPrefab(roomPrefab, position, Quaternion.Identity);
 		childModel.Parent = Actor;
 		childModel.Scale = new Vector3(Width, Height, Length);
@@ -232,70 +234,28 @@ public class DungeonGenerator : Script
 			rnd.Next((int)dungeonBounds.Minimum.Z, (int)dungeonBounds.Maximum.Z)
 		);
 
-		GridPosition gridPos0 = Pathfinding.GridSystem.GetGridPosition(position);
-
-		// Check Forward-Backward Direction
-		bool isForwardOccupied = false;
-		bool isBackwardOccupied = false;
-		if (Length > 1)
+		// Check neighbors including base position
+		List<GridPosition> neightborhood = Pathfinding.GetNeighborhood(Pathfinding.GridSystem.GetGridPosition(position), Width, Length);
+		bool canOccupySpace = true;
+		foreach (var neighbor in neightborhood)
 		{
-			Vector3 forward = new Vector3(position.X, 0, position.Z + Length);
-			Vector3 backward = new Vector3(position.X, 0, position.Z - Length);
+			Pathfinding.PathNode node = Pathfinding.GetNode(neighbor);
+			// Debug.Log($"Checking neighbor at {neighbor} with node is not null: {node != null}");
 
-			GridPosition gridForward = Pathfinding.GridSystem.GetGridPosition(forward);
-			GridPosition gridBackward = Pathfinding.GridSystem.GetGridPosition(backward);
-
-			isForwardOccupied = (bool)(Pathfinding.GetNode(gridForward)?.IsOccupied());
-			isBackwardOccupied = (bool)(Pathfinding.GetNode(gridBackward)?.IsOccupied());
+			if (node == null) continue;
+			// Debug.Log($"Node is: {node}");
+			if (!node.IsWalkable)
+			{
+				canOccupySpace = false;
+				break;
+			}
 		}
-
-		// Check Left-Right Direction
-		bool isLeftOccupied = false;
-		bool isRightOccupied = false;
-		if (Width > 1)
-		{
-			Vector3 left = new Vector3(position.X - Width, 0, position.Z);
-			Vector3 right = new Vector3(position.X + Width, 0, position.Z);
-
-			GridPosition gridLeft = Pathfinding.GridSystem.GetGridPosition(left);
-			GridPosition gridRight = Pathfinding.GridSystem.GetGridPosition(right);
-
-			isLeftOccupied = (bool)(Pathfinding.GetNode(gridLeft)?.IsOccupied());
-			isRightOccupied = (bool)(Pathfinding.GetNode(gridRight)?.IsOccupied());
-		}
-
-		// Check  Diagonals
-		bool isFLeftOccupied = false;
-		bool isFRightOccupied = false;
-		bool isBLeftOccupied = false;
-		bool isBRightOccupied = false;
-		if (Length > 1 && Width > 1)
-		{
-			Vector3 fLeft = new Vector3(position.X - Width, 0, position.Z + Length);
-			Vector3 fRight = new Vector3(position.X + Width, 0, position.Z + Length);
-			Vector3 bLeft = new Vector3(position.X - Width, 0, position.Z - Length);
-			Vector3 bRight = new Vector3(position.X + Width, 0, position.Z - Length);
-
-			GridPosition gridFLeft = Pathfinding.GridSystem.GetGridPosition(fLeft);
-			GridPosition gridFRight = Pathfinding.GridSystem.GetGridPosition(fRight);
-			GridPosition gridBLeft = Pathfinding.GridSystem.GetGridPosition(bLeft);
-			GridPosition gridBRight = Pathfinding.GridSystem.GetGridPosition(bRight);
-
-			isFLeftOccupied = (bool)(Pathfinding.GetNode(gridFLeft)?.IsOccupied());
-			isFRightOccupied = (bool)(Pathfinding.GetNode(gridFRight)?.IsOccupied());
-			isBLeftOccupied = (bool)(Pathfinding.GetNode(gridBLeft)?.IsOccupied());
-			isBRightOccupied = (bool)(Pathfinding.GetNode(gridBRight)?.IsOccupied());
-		}
-
-		bool isOccupied = !Pathfinding.GetNode(gridPos0).IsOccupied() && !isForwardOccupied && !isBackwardOccupied && !isLeftOccupied && !isRightOccupied && !isFLeftOccupied && !isFRightOccupied && !isBLeftOccupied && !isBRightOccupied;
 
 
 		// If there is no hit, set the position
-		if (isOccupied)
+		if (canOccupySpace)
 		{
 			_position = Pathfinding.GridSystem.GetConvertedWorldPosition(position);
-			// Debug.Log($"Valid room position found at {_position}");
-
 			return true;
 		}
 		Debug.Log($"Invalid room position, trying again... {maxAttemps - 1}");

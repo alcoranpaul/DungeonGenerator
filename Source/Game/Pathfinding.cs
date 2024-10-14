@@ -110,88 +110,44 @@ public class Pathfinding
 
 
 
+
+
 	public void ToggleNeighborWalkable(GridPosition basePosition, int Width, int Length, bool flag)
 	{
-		Debug.Log($"GridPosition: {basePosition} - {Width} X {Length}... GridSize: {GridSystem.ToGridSize(Width)} X {GridSystem.ToGridSize(Length)}");
-		ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z), flag);
-		if (Width > 1)
-		{
-			bool isDivisible = Width % 2 == 0; // Is divisible by 2
+		List<GridPosition> positions = GetNeighborhood(basePosition, Width, Length);
 
-			if (isDivisible)
+
+		foreach (GridPosition pos in positions)
+			ToggleNodeWalkable(pos, flag);
+
+	}
+
+	public List<GridPosition> GetNeighborhood(GridPosition basePosition, int Width, int Length)
+	{
+		List<GridPosition> positions = new List<GridPosition>();
+		int gridWidth = GridSystem.ToGridSize(Width);
+		int gridLength = GridSystem.ToGridSize(Length);
+
+		int widthOffset = gridWidth / 2;
+		int lengthOffset = gridLength / 2;
+
+
+		for (int i = 0; i < gridWidth; i++)
+		{
+			for (int j = 0; j < gridLength; j++)
 			{
-				for (int i = 1; i <= Width / 2; i++)
-				{
-					ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z), flag);
-					ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z), flag);
-				}
+				GridPosition pos = new GridPosition(basePosition.X - widthOffset + i, basePosition.Z - lengthOffset + j);
+				positions.Add(pos);
 			}
-			else
-			{
-				for (int i = 1; i < Width - 1; i++)
-				{
-					ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z), flag);
-					ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z), flag);
-				}
-			}
-			// int endCount = (Width % 2 != 0) ? Width - 1 : Width / 2;
-			// // Left and Right
-			// for (int i = 1; i < endCount; i++)
-			// {
-			// 	ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z), flag);
-			// 	ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z), flag);
-			// }
 		}
 
-		if (Length > 1)
-		{
-			bool isDivisible = Length % 2 == 0; // Is divisible by 2
-
-			if (isDivisible)
-			{
-				for (int i = 1; i <= Length / 2; i++)
-				{
-					ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z + i), flag);
-					ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z - i), flag);
-				}
-			}
-			else
-			{
-				for (int i = 1; i < Length - 1; i++)
-				{
-					ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z + i), flag);
-					ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z - i), flag);
-				}
-			}
-			// int endCount = (Length % 2 != 0) ? Length - 1 : Length / 2;
-			// // Forward and Backward
-			// for (int i = 1; i < endCount; i++)
-			// {
-			// 	ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z + i), flag);
-			// 	ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z - i), flag);
-
-			// }
-
-
-		}
-
-		// if (Width > 1 && Length > 1)
-		// {
-		// 	int count = 1;
-		// 	// Diagonal
-		// 	for (int i = 1; i < Width; i++)
-		// 	{
-		// 		ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z + i), flag);
-		// 		ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z - i), flag);
-		// 		ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z - i), flag);
-		// 		ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z + i), flag);
-		// 	}
-		// }
+		return positions;
 	}
 
 	private void ToggleNodeWalkable(GridPosition position, bool flag)
 	{
 		if (!GridSystem.IsPositionValid(position)) return;
+		// Debug.Log($"Toggling node at {position} to {flag}");
 		GetNode(position).SetWalkable(flag);
 	}
 
@@ -374,12 +330,13 @@ public class Pathfinding
 
 	public PathNode GetNode(int x, int z)
 	{
-		GridPosition position = new GridPosition(x, z);
+		GridPosition position = GridSystem.GetGridPosition(x, z);
 		return GridSystem.GetGridObject(position);
 	}
 
 	public PathNode GetNode(GridPosition position)
 	{
+
 		if (!GridSystem.IsPositionValid(position)) return null;
 		return GridSystem.GetGridObject(position);
 	}
