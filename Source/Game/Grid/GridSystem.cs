@@ -239,6 +239,11 @@ public class GridPosition
 		return new GridPosition(a.X - b.X, a.Z - b.Z);
 	}
 
+	public Vector3 ToVector3()
+	{
+		return new Vector3(X, 0, Z);
+	}
+
 
 	public override string ToString()
 	{

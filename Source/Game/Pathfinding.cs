@@ -169,7 +169,7 @@ public class Pathfinding
 		// Add Start node to the open list
 		PathNode startNode = GridSystem.GetGridObject(start);
 		PathNode endNode = GridSystem.GetGridObject(end);
-
+		// Debug.Log($"OLD Start: {startNode.GridPosition} End: {endNode.GridPosition}");
 		// Check if start or end node is not walkable
 		if (!startNode.IsWalkable)
 		{
@@ -194,9 +194,11 @@ public class Pathfinding
 
 
 		openList.Add(startNode);
-		// Debug.Log($"Start: {startNode.GridPosition} End: {endNode.GridPosition}");
+		// Debug.Log($" NEW Start: {startNode.GridPosition} End: {endNode.GridPosition}");
 		DebugDraw.DrawSphere(new BoundingSphere(GridSystem.GetWorldPosition(startNode.GridPosition), 15f), Color.DarkRed, 60f);
-		DebugDraw.DrawSphere(new BoundingSphere(GridSystem.GetWorldPosition(endNode.GridPosition), 15f), Color.DarkRed, 60f);
+		Vector3 asd = GridSystem.GetWorldPosition(endNode.GridPosition);
+		asd.Y += 100f;
+		DebugDraw.DrawSphere(new BoundingSphere(asd, 15f), Color.Azure, 60f);
 
 
 		// Initialize path nodes
@@ -227,7 +229,7 @@ public class Pathfinding
 			openList.Remove(currentNode);
 			closedList.Add(currentNode);
 
-			foreach (PathNode neighbor in GetNeighboringNodes(currentNode))
+			foreach (PathNode neighbor in GetNeighborNodes(currentNode))
 			{
 				if (closedList.Contains(neighbor)) continue;
 
@@ -238,15 +240,15 @@ public class Pathfinding
 				}
 
 				// Cost from the start node to the current node
-				int tentativeGCost;
-				if (currentNode.NodeType == NodeType.Hallway)
-				{
-					tentativeGCost = -5;
-				}
-				else
-				{
-					tentativeGCost = currentNode.GCost + CalculateDistance(currentNode.GridPosition, neighbor.GridPosition) + 10;
-				}
+				int tentativeGCost = currentNode.GCost + CalculateDistance(currentNode.GridPosition, neighbor.GridPosition);
+				// if (currentNode.NodeType == NodeType.Hallway)
+				// {
+				// 	tentativeGCost = -5;
+				// }
+				// else
+				// {
+				// 	tentativeGCost = currentNode.GCost + CalculateDistance(currentNode.GridPosition, neighbor.GridPosition) + 10;
+				// }
 
 
 				if (tentativeGCost < neighbor.GCost)  // If the new path is shorter
@@ -268,7 +270,7 @@ public class Pathfinding
 		return null;
 	}
 
-	private PathNode FindNearestWalkableNode(PathNode node, int searchRadius = 5)
+	private PathNode FindNearestWalkableNode(PathNode node, int searchRadius = 10)
 	{
 		for (int radius = 1; radius <= searchRadius; radius++)
 		{
@@ -276,13 +278,15 @@ public class Pathfinding
 			{
 				for (int z = -radius; z <= radius; z++)
 				{
-					GridPosition neighborPos = new GridPosition(node.GridPosition.X + x, node.GridPosition.Z + z);
-					if (!GridSystem.IsPositionValid(neighborPos)) continue;
 
-					PathNode neighborNode = GridSystem.GetGridObject(neighborPos);
-
+					if (node.GridPosition.X + x < 0 || node.GridPosition.Z + z < 0) continue;
+					GridPosition newPos = new GridPosition(node.GridPosition.X + x, node.GridPosition.Z + z);
+					// Debug.Log($"Checking neighbor at {newPos}");
+					PathNode neighborNode = GetNode(newPos);
+					// Debug.Log($"Neighbor node is {neighborNode}");
 					if (neighborNode != null && neighborNode.IsWalkable)
 					{
+						// Debug.Log($"Found walkable node at {neighborNode.GridPosition}");
 						return neighborNode; // Return the first walkable node found
 					}
 				}
@@ -293,14 +297,17 @@ public class Pathfinding
 	}
 
 
-	private List<PathNode> GetNeighboringNodes(PathNode currentNode)
+
+
+	private List<PathNode> GetNeighborNodes(PathNode node)
 	{
 		List<PathNode> neighboringNodes = new List<PathNode>();
 
-		GridPosition position = currentNode.GridPosition;
+		GridPosition position = node.GridPosition;
 
 		if (GridSystem.IsPositionXValid(position.X - 1))
 		{
+			Debug.Log($"Left: {position.X - 1} {position.Z}");
 			neighboringNodes.Add(GetNode(position.X - 1, position.Z)); // Left
 			if (GridSystem.IsPositionZValid(position.Z - 1))
 				neighboringNodes.Add(GetNode(position.X - 1, position.Z - 1)); // Down Left
@@ -324,19 +331,23 @@ public class Pathfinding
 		if (GridSystem.IsPositionZValid(position.Z + 1))
 			neighboringNodes.Add(GetNode(position.X, position.Z + 1)); // Up
 
-
+		string neighbors = "";
+		foreach (PathNode n in neighboringNodes)
+		{
+			neighbors += n.GridPosition + " ";
+		}
+		Debug.Log($"Neighbors of {node.GridPosition}: {neighbors}");
 		return neighboringNodes;
 	}
 
 	public PathNode GetNode(int x, int z)
 	{
-		GridPosition position = GridSystem.GetGridPosition(x, z);
-		return GridSystem.GetGridObject(position);
+		GridPosition position = new(x, z);
+		return GetNode(position);
 	}
 
 	public PathNode GetNode(GridPosition position)
 	{
-
 		if (!GridSystem.IsPositionValid(position)) return null;
 		return GridSystem.GetGridObject(position);
 	}
