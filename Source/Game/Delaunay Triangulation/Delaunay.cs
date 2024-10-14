@@ -236,6 +236,10 @@ public class Delaunay
 	{
 		public float X;
 		public float Y;
+
+		/// <summary>
+		/// Vector3 representation of the point
+		/// </summary>
 		public Vector3 VPoint => new Vector3(X, 0, Y);
 
 		public Point(float x, float y)

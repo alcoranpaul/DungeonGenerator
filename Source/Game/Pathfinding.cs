@@ -98,11 +98,6 @@ public class Pathfinding
 
 		GridSystem = new GridSystem<PathNode>(dimension, unitScale, (GridSystem<PathNode> gridSystem, GridPosition gridPosition) => { return new PathNode(gridPosition, gridSystem); });
 
-		// GetNode(1, 0).IsWalkable = false;
-		// GetNode(1, 1).IsWalkable = false;
-		// GetNode(1, 2).IsWalkable = false;
-		// GetNode(1, 3).IsWalkable = false;
-		// GetNode(1, 4).IsWalkable = false;
 
 	}
 
@@ -110,7 +105,6 @@ public class Pathfinding
 
 	public void ToggleNeighborWalkable(GridPosition basePosition, int Width, int Length, bool flag)
 	{
-		// Debug.Log($"SetObstacle: {basePosition} {Width} {Length} {flag}");
 
 		ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z), flag);
 		if (Width > 1)
@@ -176,8 +170,34 @@ public class Pathfinding
 
 		// Add Start node to the open list
 		PathNode startNode = GridSystem.GetGridObject(start);
-		openList.Add(startNode);
 		PathNode endNode = GridSystem.GetGridObject(end);
+
+		// Check if start or end node is not walkable
+		if (!startNode.IsWalkable)
+		{
+			startNode = FindNearestWalkableNode(startNode);
+			if (startNode == null)
+			{
+				Debug.Log("No walkable starting node found.");
+				return null;
+			}
+		}
+
+		if (!endNode.IsWalkable)
+		{
+			endNode = FindNearestWalkableNode(endNode);
+			if (endNode == null)
+			{
+				Debug.Log("No walkable ending node found.");
+				return null;
+			}
+		}
+
+		openList.Add(startNode);
+		Debug.Log($"Start: {startNode.GridPosition} End: {endNode.GridPosition}");
+		DebugDraw.DrawSphere(new BoundingSphere(GridSystem.GetWorldPosition(startNode.GridPosition), 15f), Color.DarkRed, 10f);
+		DebugDraw.DrawSphere(new BoundingSphere(GridSystem.GetWorldPosition(endNode.GridPosition), 15f), Color.DarkRed, 10f);
+
 
 		// Initialize path nodes
 		for (int x = 0; x < GridSystem.Dimension.X; x++)
@@ -235,8 +255,34 @@ public class Pathfinding
 		}
 
 		// No path found
+		Debug.Log("No path found");
 		return null;
 	}
+
+	private PathNode FindNearestWalkableNode(PathNode node, int searchRadius = 5)
+	{
+		for (int radius = 1; radius <= searchRadius; radius++)
+		{
+			for (int x = -radius; x <= radius; x++)
+			{
+				for (int z = -radius; z <= radius; z++)
+				{
+					GridPosition neighborPos = new GridPosition(node.GridPosition.X + x, node.GridPosition.Z + z);
+					if (!GridSystem.IsPositionValid(neighborPos)) continue;
+
+					PathNode neighborNode = GridSystem.GetGridObject(neighborPos);
+
+					if (neighborNode != null && neighborNode.IsWalkable)
+					{
+						return neighborNode; // Return the first walkable node found
+					}
+				}
+			}
+		}
+
+		return null; // No walkable node found within the search radius
+	}
+
 
 	private List<PathNode> GetNeighboringNodes(PathNode currentNode)
 	{
