@@ -32,12 +32,10 @@ public class PathfindingDebugObject : GridDebugObject
 			hCost.Text = pathNode.HCost.ToString();
 			fCost.Text = pathNode.FCost.ToString();
 		}
-		else
-		{
-			gCost.Text = "-";
-			hCost.Text = "-";
-			fCost.Text = "-";
-		}
+
+		gCost.IsActive = pathNode.IsWalkable;
+		hCost.IsActive = pathNode.IsWalkable;
+		fCost.IsActive = pathNode.IsWalkable;
 
 	}
 

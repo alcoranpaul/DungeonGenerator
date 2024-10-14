@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+
 using FlaxEngine;
 using FlaxEngine.Utilities;
 
@@ -13,22 +14,16 @@ public class DungeonGenerator : Script
 {
 	public static DungeonGenerator Instance { get; private set; }
 	public int MaxRooms = 30;
-	public int UnitScale = 5;
+	// public int UnitScale = 5;
 
-	public int MaxRoomHeight = 10;
-	public int MinRoomHeight = 5;
-	public int MaxRoomWidth = 10;
-	public int MinRoomWidth = 1;
-	public int MaxRoomLength = 10;
-	public int MinRoomLength = 1;
+	public float roomScale = 10f;
 
-	public int DungeonWidth = 100 * 5;
-	public int DungeonHeight = 100;
+	public int DungeonSize = 10;
 
 	public float RoomSizeOffset = 0.7f;
 
 	// private List<Model> modelRooms;
-	private List<Room> rooms;
+	public List<Room> rooms;
 	// private DungeonGeneratorData dungeonData;
 	private BoundingBox dungeonBounds;
 
@@ -38,8 +33,9 @@ public class DungeonGenerator : Script
 	public MaterialBase Material;
 	public Prefab debugGridPrefab;
 	public Prefab pathfindingDebugPrefab;
+	public Prefab roomPrefab;
 
-	public GridSystem<GridObject> GridSystem { get; private set; }
+	// public GridSystem<GridObject> GridSystem { get; private set; }
 	public Pathfinding Pathfinding { get; private set; }
 
 	public override void OnAwake()
@@ -55,7 +51,7 @@ public class DungeonGenerator : Script
 		// GridSystem.CreateDebugObjects(debugGridPrefab);
 
 		// Grid system for hallways
-		Pathfinding = new Pathfinding(new Vector2(10, 10), 1, pathfindingDebugPrefab);
+
 
 
 	}
@@ -64,21 +60,30 @@ public class DungeonGenerator : Script
 		// modelRooms = new List<Model>();
 		rooms = new List<Room>();
 
+		Pathfinding = new Pathfinding(new Vector2(DungeonSize, DungeonSize), 1);
+		Pathfinding.SpawnDebugObjects(pathfindingDebugPrefab);
+	}
 
+	public void SpawnDebugObjects()
+	{
 
 	}
 
 	public void GenerateDungeon()
 	{
 		Debug.Log("Generating dungeon...");
-		dungeonBounds = new BoundingBox(new Vector3(-DungeonWidth, -10, -DungeonWidth), new Vector3(DungeonWidth, 10, DungeonWidth));
+
+		dungeonBounds = Pathfinding.GetBoundingBox();
+
 		DebugDraw.DrawWireBox(dungeonBounds, Color.Beige, 10.0f);
 
 		float debugTime = 60f;
-		DestroyDungeon();
 
+		DestroyDungeon();
 		SpawnRooms();
 
+
+		Debug.Log("Calculating Delaunay Triangulation...");
 		List<Delaunay.Point> points = new List<Delaunay.Point>();
 		foreach (var room in rooms)
 		{
@@ -88,8 +93,9 @@ public class DungeonGenerator : Script
 		Delaunay delaunay = Delaunay.Triangulate(points);
 
 		// Print the triangulation
-		Debug.Log(delaunay.ToString());
+		// Debug.Log(delaunay.ToString());
 
+		Debug.Log("Calculating MST ...");
 		List<Prim.Edge> weightedEdges = new List<Prim.Edge>();
 		foreach (var edge in delaunay.Edges)
 		{
@@ -99,9 +105,10 @@ public class DungeonGenerator : Script
 		}
 
 		List<Delaunay.Edge> mst = Prim.MinimumSpanningTree(weightedEdges, points[0]);
-		// Delaunay.Edge.DebugEdges(mst, Color.Yellow, duration: debugTime);
 
+		Debug.Log($"Adding more paths into MST ..." + mst.Count);
 		// Add more edges to the MST
+		// Delaunay.Edge.DebugEdges(mst, Color.Yellow, 40f);
 		foreach (var edge in delaunay.Edges)
 		{
 			if (mst.Contains(edge)) continue;
@@ -119,67 +126,50 @@ public class DungeonGenerator : Script
 
 	private void SpawnRooms()
 	{
+		Debug.Log("Spawning rooms ...");
 		for (int i = 0; i < MaxRooms; i++)
 		{
-			Model _model = Content.CreateVirtualAsset<Model>();
-			GenerateRoom(_model, out Room newRoom);
+			GenerateRoom(out Room newRoom);
 			rooms.Add(newRoom);
 		}
 	}
 
-	private void GenerateRoom(Model _model, out Room _room)
+	private void GenerateRoom(out Room _room)
 	{
-		_room = null;
-
-		// Create the dynamic model with a single LOD and one mesh
-		_model.SetupLODs(new[] { 1 });
-
-		// Use System.Random, which is already time-seeded
-		var rnd = new Random();
-
-		// Get random values for Width, Height, and Length
-		int Width = rnd.Next(MinRoomWidth, MaxRoomWidth);
-		int Height = MinRoomHeight;
-		int Length = rnd.Next(MinRoomLength, MaxRoomLength);
-
-		// Apply scaling factor
-		Width *= UnitScale;
-		Height *= UnitScale;
-		Length *= UnitScale;
-
-		// Update mesh with initial width (X), fixed-height (Y), and length (Z)
-		UpdateMesh(_model.LODs[0].Meshes[0], Width, Height, Length);
-
-		bool isPositionValid = FindValidRoomPosition(_model, Actor.Position, out Vector3 position);
-
-		if (!isPositionValid) return;
-
-		// Create a child model actor
-		// WhatIf: Seperate Actor and Data 
-		var childModel = Actor.AddChild<StaticModel>();
-		childModel.Name = "Room" + childModel.ID;
-		childModel.Model = _model;
-		childModel.LocalScale = new Float3(1); // No scaling applied
-		childModel.SetMaterial(0, Material);
-
-		var collider = childModel.AddChild<BoxCollider>();
-		collider.AutoResize(true);
-		childModel.LocalPosition = position;
+		Random rand = new Random();
 
 
-		RoomPosition roomPosition = new RoomPosition(childModel.LocalPosition.X, childModel.LocalPosition.Z);
-		_room = new Room(roomPosition, Width, Length, Height, childModel);
+		int Width = rand.Next(1, 2);
+		int Height = rand.Next(1, 2);
+		int Length = rand.Next(1, 3);
+
+		bool isPositionValid = FindValidRoomPosition(Width, Height, Length, out Vector3 position);
+
+		if (!isPositionValid) Debug.LogError("Invalid room position");
+
+		Actor childModel = PrefabManager.SpawnPrefab(roomPrefab, position, Quaternion.Identity);
+		childModel.Parent = Actor;
+		childModel.Scale = new Vector3(Width, Height, Length);
+		StaticModel model = childModel as StaticModel;
+		model.SetMaterial(0, Material);
+
+		GridPosition gridPos = Pathfinding.GridSystem.GetGridPosition(position);
+		Pathfinding.ToggleNeighborWalkable(gridPos, Width, Length, false);
+
+		Vector3 worldPos = Pathfinding.GridSystem.GetWorldPosition(gridPos);
+		RoomPosition roomPosition = new RoomPosition(worldPos);
+		_room = new Room(roomPosition, Width, Height, Length, childModel);
+		// Debug.Log($"{_room}");
 		return;
 	}
 
-	private bool FindValidRoomPosition(Model model, Vector3 origin, out Vector3 _position)
+	private bool FindValidRoomPosition(int Width, int Height, int Length, out Vector3 _position)
 	{
 
-		BoundingBox modelBounds = model.GetBox(0);
-		return FindValidRoomPosition(origin, modelBounds, 5, out _position);
+		return FindValidRoomPosition(Width, Height, Length, 5, out _position);
 	}
 
-	private bool FindValidRoomPosition(Vector3 origin, BoundingBox modelBounds, int maxAttemps, out Vector3 _position)
+	private bool FindValidRoomPosition(int Width, int Height, int Length, int maxAttemps, out Vector3 _position)
 	{
 		if (maxAttemps <= 0)
 		{
@@ -197,28 +187,75 @@ public class DungeonGenerator : Script
 			rnd.Next((int)dungeonBounds.Minimum.Z, (int)dungeonBounds.Maximum.Z)
 		);
 
-		// Calculate half-extents of the model
-		Vector3 halfExtents = (modelBounds.Maximum - modelBounds.Minimum) * RoomSizeOffset;
+		GridPosition gridPos0 = Pathfinding.GridSystem.GetGridPosition(position);
 
-
-		// Perform the BoxCast (or any other logic with halfExtents)
-		bool hit = Physics.BoxCast(
-			position,                // Position to cast from
-			halfExtents,             // Half-extents of the box
-			Vector3.Down,            // Direction of the cast
-			out var hitInfo,         // Output hit info
-			Quaternion.Identity,     // No rotation
-			1.0f                     // Max distance to cast
-		);
-
-		// If there is no hit, set the position
-		if (!hit)
+		// Check Forward-Backward Direction
+		bool isForwardOccupied = false;
+		bool isBackwardOccupied = false;
+		if (Length > 1)
 		{
-			_position = position;
-			return true;
+			Vector3 forward = new Vector3(position.X, 0, position.Z + Length);
+			Vector3 backward = new Vector3(position.X, 0, position.Z - Length);
+
+			GridPosition gridForward = Pathfinding.GridSystem.GetGridPosition(forward);
+			GridPosition gridBackward = Pathfinding.GridSystem.GetGridPosition(backward);
+
+			isForwardOccupied = (bool)(Pathfinding.GetNode(gridForward)?.IsOccupied());
+			isBackwardOccupied = (bool)(Pathfinding.GetNode(gridBackward)?.IsOccupied());
 		}
 
-		return FindValidRoomPosition(origin, modelBounds, maxAttemps--, out _position);
+		// Check Left-Right Direction
+		bool isLeftOccupied = false;
+		bool isRightOccupied = false;
+		if (Width > 1)
+		{
+			Vector3 left = new Vector3(position.X - Width, 0, position.Z);
+			Vector3 right = new Vector3(position.X + Width, 0, position.Z);
+
+			GridPosition gridLeft = Pathfinding.GridSystem.GetGridPosition(left);
+			GridPosition gridRight = Pathfinding.GridSystem.GetGridPosition(right);
+
+			isLeftOccupied = (bool)(Pathfinding.GetNode(gridLeft)?.IsOccupied());
+			isRightOccupied = (bool)(Pathfinding.GetNode(gridRight)?.IsOccupied());
+		}
+
+		// Check  Diagonals
+		bool isFLeftOccupied = false;
+		bool isFRightOccupied = false;
+		bool isBLeftOccupied = false;
+		bool isBRightOccupied = false;
+		if (Length > 1 && Width > 1)
+		{
+			Vector3 fLeft = new Vector3(position.X - Width, 0, position.Z + Length);
+			Vector3 fRight = new Vector3(position.X + Width, 0, position.Z + Length);
+			Vector3 bLeft = new Vector3(position.X - Width, 0, position.Z - Length);
+			Vector3 bRight = new Vector3(position.X + Width, 0, position.Z - Length);
+
+			GridPosition gridFLeft = Pathfinding.GridSystem.GetGridPosition(fLeft);
+			GridPosition gridFRight = Pathfinding.GridSystem.GetGridPosition(fRight);
+			GridPosition gridBLeft = Pathfinding.GridSystem.GetGridPosition(bLeft);
+			GridPosition gridBRight = Pathfinding.GridSystem.GetGridPosition(bRight);
+
+			isFLeftOccupied = (bool)(Pathfinding.GetNode(gridFLeft)?.IsOccupied());
+			isFRightOccupied = (bool)(Pathfinding.GetNode(gridFRight)?.IsOccupied());
+			isBLeftOccupied = (bool)(Pathfinding.GetNode(gridBLeft)?.IsOccupied());
+			isBRightOccupied = (bool)(Pathfinding.GetNode(gridBRight)?.IsOccupied());
+		}
+
+		bool isOccupied = !Pathfinding.GetNode(gridPos0).IsOccupied() && !isForwardOccupied && !isBackwardOccupied && !isLeftOccupied && !isRightOccupied && !isFLeftOccupied && !isFRightOccupied && !isBLeftOccupied && !isBRightOccupied;
+
+
+		// If there is no hit, set the position
+		if (isOccupied)
+		{
+			_position = Pathfinding.GridSystem.GetConvertedWorldPosition(position);
+			// Debug.Log($"Valid room position found at {_position}");
+
+			return true;
+		}
+		// Debug.Log($"Invalid room position, trying again... {maxAttemps - 1}");
+
+		return FindValidRoomPosition(Width, Height, Length, --maxAttemps, out _position);
 
 	}
 
@@ -226,12 +263,16 @@ public class DungeonGenerator : Script
 
 	public void DestroyDungeon()
 	{
+		Debug.Log("Destoying dungeon...");
 		// If there are rooms in the list
 		if (rooms.Count > 0)
 		{
 			// Iterate through each room and set it to null
 			for (int i = 0; i < rooms.Count; i++)
 			{
+
+				GridPosition gridPos = Pathfinding.GridSystem.GetGridPosition(rooms[i].WorldPosition.Position3D);
+				Pathfinding.ToggleNeighborWalkable(gridPos, rooms[i].Width, rooms[i].Length, true);
 				rooms[i] = null;  // Set the room reference to null
 			}
 
@@ -247,48 +288,7 @@ public class DungeonGenerator : Script
 	}
 
 
-	// Method to generate the cube mesh
-	private void UpdateMesh(Mesh mesh, int Width, int Height, int Length)
-	{
 
-
-
-		// Define vertices for a cube (cuboid) with the given width, height, and fixed Z length
-		var vertices = new[]
-		{
-			// Front face (Z = FixedLengthZ / 2)
-			 new Float3(-Width / 2, -Height / 2, Length / 2),  // Bottom-left front
-			new Float3(Width / 2, -Height / 2, Length / 2),   // Bottom-right front
-			new Float3(Width / 2, Height / 2, Length / 2),    // Top-right front
-			new Float3(-Width / 2, Height / 2, Length / 2),   // Top-left front
-
-			// Back face (Z = -FixedLengthZ / 2)
-			new Float3(-Width / 2, -Height / 2, -Length / 2), // Bottom-left back
-			new Float3(Width / 2, -Height / 2, -Length / 2),  // Bottom-right back
-			new Float3(Width / 2, Height / 2, -Length / 2),   // Top-right back
-			new Float3(-Width / 2, Height / 2, -Length / 2)   // Top-left back
-		};
-
-		// Define triangles (each face of the cube is made up of 2 triangles)
-		var triangles = new[]
-		{
-			// Front face
-			0, 1, 2,  0, 2, 3,
-			// Back face
-			4, 6, 5,  4, 7, 6,
-			// Left face
-			0, 3, 7,  0, 7, 4,
-			// Right face
-			1, 5, 6,  1, 6, 2,
-			// Top face
-			3, 2, 6,  3, 6, 7,
-			// Bottom face
-			0, 4, 5,  0, 5, 1
-		};
-
-		// Update the mesh with vertices and triangles
-		mesh.UpdateMesh(vertices, triangles, vertices);
-	}
 
 	public override void OnDestroy()
 	{

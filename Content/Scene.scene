@@ -65,15 +65,15 @@
 			"Name": "Camera",
 			"Transform": {
 				"Translation": {
-					"X": -1.6611424684524537,
-					"Y": 168.74183654785157,
-					"Z": 229.4529266357422
+					"X": -8.817219734191895,
+					"Y": 1036.27001953125,
+					"Z": 460.9332580566406
 				},
 				"Orientation": {
-					"X": -0.010344438254833222,
-					"Y": -0.9143987894058228,
-					"Z": 0.4040045440196991,
-					"W": -0.023412959650158883
+					"X": 0.004766086582094431,
+					"Y": -0.8030377626419067,
+					"Z": 0.5958744883537293,
+					"W": 0.006423076614737511
 				}
 			}
 		},
@@ -102,10 +102,12 @@
 			"ParentID": "d9a4423548697513afee19b9b7808d07",
 			"V": {
 	"MaxRooms": 10,
-	"MinRoomLength": 2,
-	"DungeonWidth": 100,
+	"roomScale": 20.0,
+	"DungeonSize": 20,
+	"Material": "da45912f498bb524b428f3ad9b2e4c0c",
 	"debugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a",
-	"pathfindingDebugPrefab": "b71b10e044f0a7eb83c1a99fda4c90a1"
+	"pathfindingDebugPrefab": "b71b10e044f0a7eb83c1a99fda4c90a1",
+	"roomPrefab": "f3d896034ca9a3f0966afe81c047c45e"
 }
 		},
 		{
@@ -130,7 +132,8 @@
 			"V": {
 	"dungeonControl": "98df231e49e8f5dc512532b86ba3c5db",
 	"gridControl": "e8ea9d3a47df86bf11e6d08e5959f465",
-	"debugControl": "22eaf12e404c350e99394196a8372457"
+	"debugControl": "22eaf12e404c350e99394196a8372457",
+	"mouseActor": "404783414f12972e6b227fbc24a0e63d"
 }
 		},
 		{
@@ -418,7 +421,7 @@
 		"B": 0.91764706,
 		"A": 1.0
 	},
-	"Text": "Generate Grid",
+	"Text": "Spawn Debug Objects",
 	"CaseOption": 0,
 	"Bold": false,
 	"Italic": false,
@@ -629,6 +632,82 @@
 	"Visible": true,
 	"AutoFocus": true
 }
+		},
+		{
+			"ID": "589db3c143c416c392342c80693bfc68",
+			"TypeName": "FlaxEngine.BoxCollider",
+			"ParentID": "5400f3474426a3b83ca4fb919ceaf713",
+			"Name": "BoxCollider",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": -72.0,
+					"Z": 0.0
+				},
+				"Scale": {
+					"X": 100.0,
+					"Y": 1.0,
+					"Z": 100.0
+				}
+			}
+		},
+		{
+			"ID": "17fb628c408339a426dcca800bebd1ef",
+			"TypeName": "FlaxEngine.StaticModel",
+			"ParentID": "589db3c143c416c392342c80693bfc68",
+			"Name": "Cube",
+			"Model": "b43f0f8f4aaba3f3156896a5a22ba493",
+			"Buffer": {
+				"Entries": [
+					{
+						"Material": "db6d54174f8f373e324146923599e95e",
+						"ShadowsMode": 0,
+						"Visible": true,
+						"ReceiveDecals": false
+					}
+				]
+			}
+		},
+		{
+			"ID": "404783414f12972e6b227fbc24a0e63d",
+			"TypeName": "FlaxEngine.StaticModel",
+			"ParentID": "5400f3474426a3b83ca4fb919ceaf713",
+			"Name": "Sphere",
+			"Transform": {
+				"Scale": {
+					"X": 0.5,
+					"Y": 0.5,
+					"Z": 0.5
+				}
+			},
+			"Model": "dd86c4724bf734c4959d23b3c74faa05",
+			"Buffer": {
+				"Entries": [
+					{
+						"Material": "00000000000000000000000000000000",
+						"ShadowsMode": 3,
+						"Visible": true,
+						"ReceiveDecals": true
+					}
+				]
+			}
+		},
+		{
+			"ID": "4cd8b7c9425b06536bb04e9d90e2a8ff",
+			"TypeName": "FlaxEngine.StaticModel",
+			"ParentID": "5400f3474426a3b83ca4fb919ceaf713",
+			"Name": "Capsule",
+			"Model": "3f82e57744f57c28285150b646ad2198",
+			"Buffer": {
+				"Entries": [
+					{
+						"Material": "00000000000000000000000000000000",
+						"ShadowsMode": 3,
+						"Visible": true,
+						"ReceiveDecals": true
+					}
+				]
+			}
 		}
 	]
 }

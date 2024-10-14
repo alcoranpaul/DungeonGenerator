@@ -38,6 +38,11 @@ public class GridSystem<TGridObject>
 		}
 	}
 
+	public bool IsPositionValid(GridPosition position)
+	{
+		return IsPositionValid(position.X, position.Z);
+	}
+
 	public bool IsPositionValid(int x, int z)
 	{
 		return IsPositionXValid(x) && IsPositionZValid(z);
@@ -67,16 +72,27 @@ public class GridSystem<TGridObject>
 				gridDebugObject.SetGridObject(GetGridObject(gridPos));
 				debugObj.Name = $"GridObject_{gridPos}";
 
-				BoundingSphere sphere = new BoundingSphere(GetWorldPosition(gridPos), 5f); // Convert radius to meters
-				DebugDraw.DrawSphere(sphere, Color.Red, 20);
+				// BoundingSphere sphere = new BoundingSphere(GetWorldPosition(gridPos), 5f); // Convert radius to meters
+				// DebugDraw.DrawSphere(sphere, Color.Red, 20);
 
 			}
 		}
 		DrawGridBoundingBox();
 	}
 
+	public BoundingBox GetBoundingBox()
+	{
+		BoundingBox gridBounds = GetBoundingBox(out Vector3 minWorldPos, out Vector3 maxWorldPos);
+		float halfUnitScale = UnitScale / 2;
+		gridBounds.Minimum.X -= halfUnitScale;
+		gridBounds.Minimum.Z -= halfUnitScale;
 
-	public BoundingBox GetBoundingBox(out Vector3 minWorldPos, out Vector3 maxWorldPos)
+		gridBounds.Maximum.X += halfUnitScale;
+		gridBounds.Maximum.Z += halfUnitScale;
+		return gridBounds;
+	}
+
+	private BoundingBox GetBoundingBox(out Vector3 minWorldPos, out Vector3 maxWorldPos, bool isDebug = false, float yOffset = 0)
 	{
 		// Define grid boundaries in grid coordinates
 		GridPosition min = (gridObjects[0, 0] as IGridObject).GridPosition;
@@ -86,8 +102,17 @@ public class GridSystem<TGridObject>
 		minWorldPos = GetWorldPosition(min);
 		maxWorldPos = GetWorldPosition(max);
 
+		// Add the y offset
+		if (isDebug)
+		{
+			minWorldPos.Y += yOffset;
+			maxWorldPos.Y += yOffset;
+		}
+
+
 		return new BoundingBox(minWorldPos, maxWorldPos);
 	}
+
 	private void DrawGridBoundingBox()
 	{
 		// Create a bounding box from the world positions
@@ -129,6 +154,12 @@ public class GridSystem<TGridObject>
 		float offsetZ = gridSizeZ / CENTER_OFFSET * UnitScale;
 
 		return new Vector3(offsetX, 0, offsetZ);
+	}
+
+	public Vector3 GetConvertedWorldPosition(Vector3 worldPosition)
+	{
+		GridPosition gridPos = GetGridPosition(worldPosition);
+		return GetWorldPosition(gridPos);
 	}
 
 	public Vector3 GetWorldPosition(GridPosition pos)

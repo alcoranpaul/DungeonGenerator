@@ -13,6 +13,7 @@ public class Pathfinding
 
 	public class PathNode : IGridObject
 	{
+		public GridSystem<PathNode> GridSystem { get; private set; }
 		public GridPosition GridPosition { get; private set; }
 
 		public int GCost { get; private set; }
@@ -20,16 +21,24 @@ public class Pathfinding
 		public int FCost { get; private set; }
 
 		public PathNode PreviousNode { get; private set; }
-		public bool IsWalkable { get; set; } = true;
+		public bool IsWalkable { get; private set; }
 
 		public event EventHandler OnDataChanged;
 
-		public PathNode(GridPosition position)
+		public PathNode(GridPosition position, GridSystem<PathNode> gridSystem)
 		{
+			GridSystem = gridSystem;
 			GridPosition = position;
 			GCost = -1;
 			HCost = -1;
 			FCost = -1;
+			IsWalkable = true;
+		}
+
+		public void SetWalkable(bool flag)
+		{
+			IsWalkable = flag;
+			OnDataChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		public void SetGCost(int gCost)
@@ -55,6 +64,25 @@ public class Pathfinding
 			PreviousNode = previousNode;
 		}
 
+		public bool IsOccupied()
+		{
+			Vector3 pos = GridSystem.GetWorldPosition(GridPosition);
+			pos.Y -= 100f;
+
+			DebugDraw.DrawSphere(new BoundingSphere(pos, 5f), Color.Red, 10f);
+			if (Physics.RayCastAll(pos, Vector3.Up, out RayCastHit[] hits, 100f))
+			{
+				foreach (RayCastHit hit in hits)
+				{
+					if (hit.Collider.HasTag("Pathfinding.Obstacle"))
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
 		public override string ToString()
 		{
 			return GridPosition.ToString();
@@ -65,16 +93,79 @@ public class Pathfinding
 	private const int MOVE_STRAIGHT_COST = 10;
 	private const int MOVE_DIAGONAL_COST = 14;
 
-	public Pathfinding(Vector2 dimension, float unitScale, Prefab debugGridPrefab)
+	public Pathfinding(Vector2 dimension, float unitScale)
 	{
 
-		GridSystem = new GridSystem<PathNode>(dimension, unitScale, (GridSystem<PathNode> gridSystem, GridPosition gridPosition) => { return new PathNode(gridPosition); });
+		GridSystem = new GridSystem<PathNode>(dimension, unitScale, (GridSystem<PathNode> gridSystem, GridPosition gridPosition) => { return new PathNode(gridPosition, gridSystem); });
 
-		GetNode(1, 0).IsWalkable = false;
-		GetNode(1, 1).IsWalkable = false;
-		GetNode(1, 2).IsWalkable = false;
-		GetNode(1, 3).IsWalkable = false;
-		GetNode(1, 4).IsWalkable = false;
+		// GetNode(1, 0).IsWalkable = false;
+		// GetNode(1, 1).IsWalkable = false;
+		// GetNode(1, 2).IsWalkable = false;
+		// GetNode(1, 3).IsWalkable = false;
+		// GetNode(1, 4).IsWalkable = false;
+
+	}
+
+
+
+	public void ToggleNeighborWalkable(GridPosition basePosition, int Width, int Length, bool flag)
+	{
+		// Debug.Log($"SetObstacle: {basePosition} {Width} {Length} {flag}");
+
+		ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z), flag);
+		if (Width > 1)
+		{
+			// Left and Right
+			for (int i = 1; i < Width; i++)
+			{
+
+				ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z), flag);
+				ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z), flag);
+
+
+			}
+		}
+
+		if (Length > 1)
+		{
+			// Forward and Backward
+			for (int i = 1; i < Length; i++)
+			{
+				ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z + i), flag);
+				ToggleNodeWalkable(new GridPosition(basePosition.X, basePosition.Z - i), flag);
+
+			}
+
+
+		}
+
+		if (Width > 1 && Length > 1)
+		{
+			// Diagonal
+			for (int i = 1; i < Width; i++)
+			{
+				ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z + i), flag);
+				ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z - i), flag);
+				ToggleNodeWalkable(new GridPosition(basePosition.X + i, basePosition.Z - i), flag);
+				ToggleNodeWalkable(new GridPosition(basePosition.X - i, basePosition.Z + i), flag);
+
+			}
+		}
+	}
+
+	private void ToggleNodeWalkable(GridPosition position, bool flag)
+	{
+		if (!GridSystem.IsPositionValid(position)) return;
+		GetNode(position).SetWalkable(flag);
+	}
+
+	public BoundingBox GetBoundingBox()
+	{
+		return GridSystem.GetBoundingBox();
+	}
+
+	public void SpawnDebugObjects(Prefab debugGridPrefab)
+	{
 		GridSystem.CreateDebugObjects(debugGridPrefab);
 	}
 
@@ -182,9 +273,15 @@ public class Pathfinding
 		return neighboringNodes;
 	}
 
-	private PathNode GetNode(int x, int z)
+	public PathNode GetNode(int x, int z)
 	{
 		GridPosition position = new GridPosition(x, z);
+		return GridSystem.GetGridObject(position);
+	}
+
+	public PathNode GetNode(GridPosition position)
+	{
+		if (!GridSystem.IsPositionValid(position)) return null;
 		return GridSystem.GetGridObject(position);
 	}
 

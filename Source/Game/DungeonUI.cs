@@ -104,7 +104,7 @@ public class DungeonUI : Script
 	private void GenerateGridSystem()
 	{
 		ClearDebugDraw();
-		DungeonGenerator.Instance.GenerateGridSystem();
+		DungeonGenerator.Instance.SpawnDebugObjects();
 	}
 
 }

@@ -295,7 +295,7 @@ public class Delaunay
 			// Draw edges or any other post-processing
 			foreach (var edge in edges)
 			{
-				Debug.Log(edge);
+
 				Vector3 a = new Vector3(edge.A.X, yOffset, edge.A.Y);
 				Vector3 b = new Vector3(edge.B.X, yOffset, edge.B.Y);
 				DebugDraw.DrawLine(a, b, color, duration);
