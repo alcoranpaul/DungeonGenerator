@@ -5,8 +5,8 @@
 		"gulp.autoDetect": "off",
 		"jake.autoDetect": "off",
 		"grunt.autoDetect": "off",
-		"omnisharp.useModernNet": true,
-		"dotnet.defaultSolution": "DungeonGenerator.sln"
+		"omnisharp.defaultLaunchSolution": "DungeonGenerator.sln",
+		"omnisharp.useModernNet": true
 	},
 	"folders": [
 		{
