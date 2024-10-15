@@ -204,6 +204,7 @@ public class GridSystem<TGridObject>
 		return new GridPosition(gridX, gridZ);
 	}
 
+
 }
 
 public interface IGridObject

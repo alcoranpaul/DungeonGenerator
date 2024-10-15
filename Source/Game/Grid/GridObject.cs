@@ -7,14 +7,15 @@ namespace Game;
 /// <summary>
 /// GridObject Script.
 /// </summary>
-public class GridObject : IGridObject
+public class GridObject<T> : IGridObject where T : GridObject<T>
 {
-	public GridSystem<GridObject> GridSystem { get; private set; }
+	public GridSystem<T> GridSystem { get; private set; }
 	public GridPosition GridPosition { get; private set; }
 
-	public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
+	public GridObject(GridSystem<T> gridSystem, GridPosition gridPosition)
 	{
 		GridSystem = gridSystem;
 		GridPosition = gridPosition;
 	}
 }
+

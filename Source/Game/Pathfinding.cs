@@ -17,11 +17,8 @@ public class Pathfinding
 		Other
 	}
 
-	public class PathNode : IGridObject
+	public class PathNode : GridObject<PathNode>
 	{
-		public GridSystem<PathNode> GridSystem { get; private set; }
-		public GridPosition GridPosition { get; private set; }
-
 		public int GCost { get; private set; }
 		public int HCost { get; private set; }
 		public int FCost { get; private set; }
@@ -32,10 +29,9 @@ public class Pathfinding
 		public event EventHandler OnDataChanged;
 		public NodeType NodeType { get; set; }  // New property to define node type
 
-		public PathNode(GridPosition position, GridSystem<PathNode> gridSystem)
+
+		public PathNode(GridSystem<PathNode> gridSystem, GridPosition gridPosition) : base(gridSystem, gridPosition)
 		{
-			GridSystem = gridSystem;
-			GridPosition = position;
 			GCost = -1;
 			HCost = -1;
 			FCost = -1;
@@ -103,7 +99,7 @@ public class Pathfinding
 	public Pathfinding(Vector2 dimension, float unitScale)
 	{
 
-		GridSystem = new GridSystem<PathNode>(dimension, unitScale, (GridSystem<PathNode> gridSystem, GridPosition gridPosition) => { return new PathNode(gridPosition, gridSystem); });
+		GridSystem = new GridSystem<PathNode>(dimension, unitScale, (GridSystem<PathNode> gridSystem, GridPosition gridPosition) => { return new PathNode(gridSystem, gridPosition); });
 
 
 	}
