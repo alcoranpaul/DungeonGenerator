@@ -19,15 +19,16 @@ namespace DunGen
 			_description = new PluginDescription
 			{
 				Name = "DunGen",
-				Category = "Other",
-				Author = "",
-				AuthorUrl = null,
-				HomepageUrl = null,
-				RepositoryUrl = "https://github.com/FlaxEngine/DunGen",
-				Description = "This is an example plugin project.",
-				Version = new Version(),
-				IsAlpha = false,
+				Category = "Procedural",
+				Author = "D1g1Talino",
+				AuthorUrl = "https://github.com/alcoranpaul/DunGen",
+				HomepageUrl = "https://github.com/alcoranpaul/DunGen",
+				RepositoryUrl = "https://github.com/alcoranpaul/DunGen",
+				Description = "Procedural Dungeon Generator",
+				Version = new Version(0, 1),
+				IsAlpha = true,
 				IsBeta = false,
+
 			};
 		}
 

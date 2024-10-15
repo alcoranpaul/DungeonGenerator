@@ -1,5 +1,6 @@
 ﻿#if FLAX_EDITOR
 
+using System;
 using System.IO;
 using DunGen;
 using FlaxEditor;
@@ -21,29 +22,31 @@ public class DunGenEditor : EditorPlugin
 	public static string SettingsPath => Path.Combine(Globals.ProjectContentFolder + SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
 
 	private ToolStripButton _button;
+
+	public DunGenEditor()
+	{
+		_description = new PluginDescription
+		{
+			Name = "DunGenEditor",
+			Category = "Procedural",
+			Author = "D1g1Talino",
+			AuthorUrl = "https://github.com/alcoranpaul",
+			HomepageUrl = "https://github.com/alcoranpaul",
+			RepositoryUrl = "https://github.com/alcoranpaul/DunGen",
+			Description = "Editor for DunGen",
+			Version = new Version(0, 1),
+			IsAlpha = true,
+			IsBeta = false,
+
+		};
+	}
 	/// <inheritdoc />
 	public override void InitializeEditor()
 	{
 		base.InitializeEditor();
 		_button = Editor.UI.ToolStrip.AddButton("DunGen");
-		_button.Clicked += () => new DunGenWindow().Show(); ;
+		_button.Clicked += () => new DunGenWindow(_description).Show();
 
-
-		// bool saveJson = Editor.SaveJsonAsset(SettingsPath, new DungeonGenSettings());
-		// bool setsettings = GameSettings.SetCustomSettings(SETTINGS_NAME, Content.LoadAsync<JsonAsset>(SettingsPath));
-
-
-		// Debug.Log($"DunGenEditor Initialize: JSON-{!saveJson} Settings-{!setsettings}");
-		// assetProxy = new CustomSettingsProxy(typeof(RoomSettings), "Room Settings");
-		// Editor.ContentDatabase.AddProxy(assetProxy);
-		// Debug.Log("DunGenEditor Initialize");
-
-
-	}
-
-	public void Test()
-	{
-		Debug.Log($"{Content.GetAsset(SettingsPath)}");
 	}
 
 	/// <inheritdoc />
@@ -54,7 +57,7 @@ public class DunGenEditor : EditorPlugin
 			_button.Dispose();
 			_button = null;
 		}
-		// Editor.ContentDatabase.RemoveProxy(assetProxy);
+
 		// Debug.Log("DunGenEditor Deinitialize");
 		base.DeinitializeEditor();
 	}

@@ -21,7 +21,7 @@ public class Generator
 
 	public Generator()
 	{
-		Debug.Log("Generator Constructor");
+		// Debug.Log("Generator Constructor");
 		if (Instance != null)
 			Instance = this;
 
@@ -46,11 +46,8 @@ public class Generator
 			Level.SpawnActor(DungeonGenActor);
 
 		}
-		else
-		{
-			Debug.Log($"DunGen actor found");
-		}
-		Debug.Log("Generating dungeon...");
+
+		// Debug.Log("Generating dungeon...");
 		ChangeState(DungeonGenState.Generating);
 
 		// Setup Grid plus Pathfinding
@@ -63,7 +60,7 @@ public class Generator
 
 		ChangeGeneratorState(GeneratorState.None);
 		ChangeState(DungeonGenState.None);
-		Debug.Log("Dungeon generation complete");
+		// Debug.Log("Dungeon generation complete");
 
 	}
 
