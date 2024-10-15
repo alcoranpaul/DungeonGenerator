@@ -1,19 +1,16 @@
 ﻿{
-	"Name": "DungeonGenerator",
+	"Name": "DunGen",
 	"Version": "1.0",
-	"Company": "My Company",
+	"Company": "",
 	"Copyright": "",
-	"GameTarget": "GameTarget",
-	"EditorTarget": "GameEditorTarget",
+	"GameTarget": "DunGenTarget",
+	"EditorTarget": "DunGenEditorTarget",
 	"References": [
 		{
 			"Name": "$(EnginePath)/Flax.flaxproj"
 		},
 		{
-			"Name": "$(ProjectPath)/Plugins/GridSystem/GridSystem.flaxproj"
-		},
-		{
-			"Name": "$(ProjectPath)/Plugins/DunGen/DunGen.flaxproj"
+			"Name": "$(ProjectPath)/../GridSystem/GridSystem.flaxproj"
 		}
 	],
 	"DefaultScene": null,
@@ -26,9 +23,9 @@
 		"Direction": {
 			"X": 0.0,
 			"Y": 0.0,
-			"Z": 1.0
+			"Z": 0.0
 		}
 	},
-	"MinEngineVersion": "0.0.6194",
+	"MinEngineVersion": "0.0.6167",
 	"EngineNickname": null
 }

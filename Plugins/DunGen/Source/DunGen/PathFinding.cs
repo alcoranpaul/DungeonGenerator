@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using GridSystem;
 using FlaxEngine;
 
-namespace Game;
+namespace DunGen;
 
 /// <summary>
-/// Pathfinding Script.
+/// PathFinding Script.
 /// </summary>
-public class Pathfinding
+public class PathFinding
 {
 	public enum NodeType
 	{
@@ -96,15 +96,17 @@ public class Pathfinding
 	private const int MOVE_STRAIGHT_COST = 10;
 	private const int MOVE_DIAGONAL_COST = 14;
 
-	public Pathfinding(Vector2 dimension, float unitScale)
+	public PathFinding(Vector2 dimension, float unitScale = 1)
 	{
-
 		GridSystem = new GridSystem<PathNode>(dimension, unitScale, (GridSystem<PathNode> gridSystem, GridPosition gridPosition) => { return new PathNode(gridSystem, gridPosition); });
-
 
 	}
 
+	public PathFinding(int dimension, float unitScale = 1)
+	{
+		GridSystem = new GridSystem<PathNode>(new Vector2(dimension), unitScale, (GridSystem<PathNode> gridSystem, GridPosition gridPosition) => { return new PathNode(gridSystem, gridPosition); });
 
+	}
 
 
 

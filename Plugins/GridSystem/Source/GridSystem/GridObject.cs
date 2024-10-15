@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FlaxEngine;
 
-namespace Game;
+namespace GridSystem;
 
 /// <summary>
 /// GridObject Script.
@@ -19,3 +19,10 @@ public class GridObject<T> : IGridObject where T : GridObject<T>
 	}
 }
 
+/// <summary>
+/// 
+/// </summary>
+public interface IGridObject
+{
+	public GridPosition GridPosition { get; }
+}

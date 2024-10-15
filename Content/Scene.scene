@@ -91,27 +91,6 @@
 			"Name": "Audio Listener"
 		},
 		{
-			"ID": "d9a4423548697513afee19b9b7808d07",
-			"TypeName": "FlaxEngine.EmptyActor",
-			"ParentID": "5400f3474426a3b83ca4fb919ceaf713",
-			"Name": "EmptyActor"
-		},
-		{
-			"ID": "dda934b349379dec21c386b94dfe02c8",
-			"TypeName": "Game.DungeonGenerator",
-			"ParentID": "d9a4423548697513afee19b9b7808d07",
-			"V": {
-	"MaxRooms": 15,
-	"roomScale": 20.0,
-	"DungeonSize": 30,
-	"Material": "da45912f498bb524b428f3ad9b2e4c0c",
-	"debugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a",
-	"pathfindingDebugPrefab": "b71b10e044f0a7eb83c1a99fda4c90a1",
-	"roomPrefab": "f3d896034ca9a3f0966afe81c047c45e",
-	"floorPrefab": "3e10e49441a0137931b654a1c18b11b7"
-}
-		},
-		{
 			"ID": "b1fd5cef42bcd0d318667b953126794c",
 			"TypeName": "FlaxEngine.UICanvas",
 			"ParentID": "5400f3474426a3b83ca4fb919ceaf713",

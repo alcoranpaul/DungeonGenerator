@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DunGen;
 using FlaxEngine;
 using FlaxEngine.GUI;
 
@@ -52,35 +53,12 @@ public class DungeonUI : Script
 		debugButton = debugControl.Get<Button>();
 		debugButton.Clicked += ClearDebugDraw;
 
-		TestEvent.Pressed += CalculatePath;
-	}
-
-
-
-	private void CalculatePath()
-	{
-		var pos = Input.MousePosition;
-		var ray = Camera.MainCamera.ConvertMouseToRay(pos);
-		if (Physics.RayCast(ray.Position, ray.Direction, out RayCastHit hit))
-		{
-
-			mouseActor.Position = hit.Point;
-			GridPosition startingGridPos = new GridPosition(0, 0);
-			GridPosition endPos = DungeonGenerator.Instance.Pathfinding.GridSystem.GetGridPosition(hit.Point);
-			List<GridPosition> paths = DungeonGenerator.Instance.Pathfinding.FindPath(startingGridPos, endPos);
-
-			for (int i = 0; i < paths.Count - 1; i++)
-			{
-				DebugDraw.DrawLine(
-					DungeonGenerator.Instance.Pathfinding.GridSystem.GetWorldPosition(paths[i]),
-					DungeonGenerator.Instance.Pathfinding.GridSystem.GetWorldPosition(paths[i + 1]),
-					Color.Red,
-					10f
-				);
-			}
-		}
 
 	}
+
+
+
+
 
 
 
@@ -98,13 +76,13 @@ public class DungeonUI : Script
 	private void GenerateDungeon()
 	{
 		ClearDebugDraw();
-		DungeonGenerator.Instance.GenerateDungeon();
+		PluginManager.GetPlugin<DunGen.DunGen>().GenerateDungeon();
+
 	}
 
 	private void GenerateGridSystem()
 	{
 		ClearDebugDraw();
-		DungeonGenerator.Instance.SpawnDebug();
 
 	}
 

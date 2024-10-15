@@ -92,6 +92,15 @@
 			"externalConsole": true
 		},
 		{
+			"type": "cppvsdbg",
+			"name": "DungeonGenerator (Attach Editor)",
+			"request": "attach",
+			"processId": "${command:pickProcess}",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"visualizerFile": "E:\\Game Development\\Flax\\Flax_master\\Source\\flax.natvis"
+		},
+		{
 			"type": "coreclr",
 			"name": "DungeonGenerator (C# Attach Editor)",
 			"request": "attach",

@@ -3,22 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using FlaxEngine;
 
-namespace Game;
+namespace DunGen;
 
 /// <summary>
-/// Generate a Delaunay triangulation from a list of points
-/// <para>
-/// Reference: https://en.wikipedia.org/wiki/Bowyer–Watson_algorithm
-/// </para>
+/// DelaunayTriangulationTriangulation Script.
 /// </summary>
-public class Delaunay
+public class DelaunayTriangulation
 {
-
 	public List<Triangle> Triangulation { get; private set; }
 	public HashSet<Edge> Edges { get; private set; }
 	public List<Point> Points { get; private set; }
 
-	public Delaunay()
+	public DelaunayTriangulation()
 	{
 		Triangulation = new List<Triangle>();
 	}
@@ -64,14 +60,14 @@ public class Delaunay
 	}
 
 #if FLAX_EDITOR
-	public static void DebugTriangulation(Delaunay delaunay, Color edgeColor, Color pointColor, float yOffset = 20, float duration = 16f, float sphereRadius = 2f)
+	public static void DebugTriangulation(DelaunayTriangulation DelaunayTriangulation, Color edgeColor, Color pointColor, float yOffset = 20, float duration = 16f, float sphereRadius = 2f)
 	{
-		if (delaunay == null || delaunay.Triangulation == null || delaunay.Triangulation.Count == 0)
+		if (DelaunayTriangulation == null || DelaunayTriangulation.Triangulation == null || DelaunayTriangulation.Triangulation.Count == 0)
 		{
 			return;
 		}
 
-		foreach (var triangle in delaunay.Triangulation)
+		foreach (var triangle in DelaunayTriangulation.Triangulation)
 		{
 			Vector3 aPoint = triangle.A.VPoint;
 			Vector3 bPoint = triangle.B.VPoint;
@@ -103,17 +99,17 @@ public class Delaunay
 	/// <param name="points"></param>
 	/// <returns></returns>
 	/// <returns></returns>
-	public static Delaunay Triangulate(List<Point> points)
+	public static DelaunayTriangulation Triangulate(List<Point> points)
 	{
-		Delaunay delaunay = new Delaunay();
-		delaunay.Edges = new HashSet<Edge>();
-		delaunay.Points = points;
-		delaunay.Generate(points);
-		return delaunay;
+		DelaunayTriangulation DelaunayTriangulation = new DelaunayTriangulation();
+		DelaunayTriangulation.Edges = new HashSet<Edge>();
+		DelaunayTriangulation.Points = points;
+		DelaunayTriangulation.Generate(points);
+		return DelaunayTriangulation;
 	}
 
 	/// <summary>
-	/// Generate the Delaunay triangulation: O(n)
+	/// Generate the DelaunayTriangulation triangulation: O(n)
 	/// </summary>
 	/// <param name="points"></param>
 	public void Generate(List<Point> points)

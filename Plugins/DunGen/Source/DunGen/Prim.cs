@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using FlaxEngine;
 
-
-namespace Game;
+namespace DunGen;
 
 /// <summary>
 /// Prim Script.
 /// </summary>
 public class Prim
 {
-	public class Edge : Delaunay.Edge
+	public class Edge : DelaunayTriangulation.Edge
 	{
 		public float Distance { get; private set; }
-		public Edge(Delaunay.Point a, Delaunay.Point b) : base(a, b)
+		public Edge(DelaunayTriangulation.Point a, DelaunayTriangulation.Point b) : base(a, b)
 		{
 			Distance = Vector3.Distance(a.VPoint, b.VPoint);
 		}
@@ -86,9 +85,9 @@ public class Prim
 	{
 		public List<Prim.Edge> ConnectedEdges { get; private set; }
 		public List<Vertex> Neighbors { get; private set; }
-		public Delaunay.Point Point { get; private set; }
+		public DelaunayTriangulation.Point Point { get; private set; }
 
-		public Vertex(Delaunay.Point point)
+		public Vertex(DelaunayTriangulation.Point point)
 		{
 			Neighbors = new List<Vertex>();
 			ConnectedEdges = new List<Prim.Edge>();
@@ -142,7 +141,7 @@ public class Prim
 		}
 	}
 
-	private static Vertex FindVertex(Delaunay.Point point, HashSet<Vertex> vertices)
+	private static Vertex FindVertex(DelaunayTriangulation.Point point, HashSet<Vertex> vertices)
 	{
 		foreach (var vertex in vertices)
 		{
@@ -155,7 +154,7 @@ public class Prim
 		return null;
 	}
 
-	private static Vertex FindVertex(Delaunay.Point point, List<Vertex> vertices)
+	private static Vertex FindVertex(DelaunayTriangulation.Point point, List<Vertex> vertices)
 	{
 		foreach (var vertex in vertices)
 		{
@@ -188,9 +187,9 @@ public class Prim
 	/// <param name="weightedEdges">List of edges with weights.</param>
 	/// <param name="start">The starting point for Prim's algorithm.</param>
 	/// <returns>A list of edges that make up the Minimum Spanning Tree.</returns>
-	public static List<Delaunay.Edge> MinimumSpanningTree(List<Prim.Edge> weightedEdges, Delaunay.Point start)
+	public static List<DelaunayTriangulation.Edge> MinimumSpanningTree(List<Prim.Edge> weightedEdges, DelaunayTriangulation.Point start)
 	{
-		HashSet<Delaunay.Edge> mst = new HashSet<Delaunay.Edge>();
+		HashSet<DelaunayTriangulation.Edge> mst = new HashSet<DelaunayTriangulation.Edge>();
 
 		// Create the vertex set from the edges
 		HashSet<Vertex> vertices = CreateVertexSet(weightedEdges); // O(V * E)
@@ -248,7 +247,7 @@ public class Prim
 	/// <returns>A HashSet of vertices created from the edges.</returns>
 	private static HashSet<Vertex> CreateVertexSet(List<Edge> weightedEdges)
 	{
-		HashSet<Delaunay.Point> points = new HashSet<Delaunay.Point>();
+		HashSet<DelaunayTriangulation.Point> points = new HashSet<DelaunayTriangulation.Point>();
 
 		// Add unique points from edges to the points set
 		foreach (var edge in weightedEdges)
