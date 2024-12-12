@@ -55,7 +55,7 @@ public class Generator
 		Settings.BoundingBox = Pathfinding.GetBoundingBox();
 
 		DestroyDungeon();
-		SpawnRooms();
+		GenerateRooms();
 		GenerateHallwayPaths();
 
 		ChangeGeneratorState(GeneratorState.None);
@@ -90,7 +90,7 @@ public class Generator
 
 	}
 
-	private void SpawnRooms()
+	private void GenerateRooms()
 	{
 		ChangeGeneratorState(GeneratorState.SpawningRooms);
 		for (int i = 0; i < Settings.MaxRooms; i++)
